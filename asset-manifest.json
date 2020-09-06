@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/aq-monitor/static/css/main.17f059be.chunk.css",
+    "main.js": "/aq-monitor/static/js/main.f8d6d1fa.chunk.js",
+    "main.js.map": "/aq-monitor/static/js/main.f8d6d1fa.chunk.js.map",
+    "runtime-main.js": "/aq-monitor/static/js/runtime-main.44834d90.js",
+    "runtime-main.js.map": "/aq-monitor/static/js/runtime-main.44834d90.js.map",
+    "static/js/2.ec6d71b8.chunk.js": "/aq-monitor/static/js/2.ec6d71b8.chunk.js",
+    "static/js/2.ec6d71b8.chunk.js.map": "/aq-monitor/static/js/2.ec6d71b8.chunk.js.map",
+    "index.html": "/aq-monitor/index.html",
+    "precache-manifest.8be16e45f11ecb5e950f732c5a4a8652.js": "/aq-monitor/precache-manifest.8be16e45f11ecb5e950f732c5a4a8652.js",
+    "service-worker.js": "/aq-monitor/service-worker.js",
+    "static/css/main.17f059be.chunk.css.map": "/aq-monitor/static/css/main.17f059be.chunk.css.map",
+    "static/js/2.ec6d71b8.chunk.js.LICENSE.txt": "/aq-monitor/static/js/2.ec6d71b8.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.44834d90.js",
+    "static/js/2.ec6d71b8.chunk.js",
+    "static/css/main.17f059be.chunk.css",
+    "static/js/main.f8d6d1fa.chunk.js"
+  ]
+}
