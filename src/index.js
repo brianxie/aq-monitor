@@ -109,7 +109,6 @@ class Monitor extends React.Component {
   // Reads raw sensor results from purpleair.
   // Future function.
   getRawResults() {
-    return Promise.reject("TODO TESTING ONLY");
     const srcUrl = "https://www.purpleair.com/json";
     return fetch(srcUrl)
       .then(response => this.checkResponseOk(response))
@@ -204,6 +203,7 @@ class Monitor extends React.Component {
       <CSSTransition
         in={statusActive}
         appear={true}
+        timeout={300}
         classNames="StatusTransition"
       >
         <div>
