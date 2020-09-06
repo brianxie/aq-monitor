@@ -17,15 +17,19 @@ class Button extends React.Component {
   }
 }
 
-// statusText, position
+// aqiText, position
 class Status extends React.Component {
   render() {
     return (
-      <div>
-        {this.props.statusText}
-        {<br />}
-        {"Your position: "}
-        {this.props.position}
+      <div className="Status">
+        <div className="AQI">
+          {this.props.aqiText}
+        </div>
+        <br />
+        <div className="Position">
+          {"Your position: "}
+          {this.props.position}
+        </div>
       </div>
     );
   }
@@ -35,10 +39,23 @@ class Monitor extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      statusText: "Default status text.",
+      aqiText: "Default AQI text.",
       count: 0,
       position: "Default position.",
     };
+  }
+
+  componentDidMount() {
+    this.updateStatusAndButton();
+    const pollIntervalMillis = 30000; // 30 second
+    this.timerId = setInterval(
+      () => this.updateStatusAndButton(),
+      pollIntervalMillis
+    );
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timerId);
   }
 
   // Transforms a result into an object containing the latitude, longitude, and result itself.
@@ -101,8 +118,9 @@ class Monitor extends React.Component {
 
   // Fetches location and sensor readings, and updates the status.
   updateStatusAndButton() {
+    console.log("[" + new Date() + "] updating...");
     this.setState({count: this.state.count + 1});
-    this.setState({statusText: "Request pending..."});
+    this.setState({aqiText: "Request pending..."});
     this.setState({position: "Position pending..."});
 
     // Issue requests for position and sensor readings.
@@ -128,7 +146,7 @@ class Monitor extends React.Component {
       .catch(error => this.handlePositionError(error));
 
     // Check for errors with the sensor reading per se, because Promise.all fails fast.
-    // The status value can't be updated until we have both position and sensor readings.
+    // The AQI value can't be updated until we have both position and sensor readings.
     rawResultsPromise = rawResultsPromise
       .catch(error => this.handleResultError(error));
 
@@ -136,13 +154,13 @@ class Monitor extends React.Component {
     Promise.all([rawResultsPromise, positionPromise])
       .then(promises => this.getSortedResults(promises[0], promises[1]))
       .then(filteredResults => this.handleFilteredResults(filteredResults))
-      .then(status => this.setState({statusText: status}))
-      .catch(error => this.setState({statusText: error.message}));
+      .then(aqi => this.setState({aqiText: aqi}))
+      .catch(error => this.setState({aqiText: error.message}));
   }
 
   renderStatus() {
     return <Status
-      statusText={this.state.statusText}
+      aqiText={this.state.aqiText}
       position={this.state.position}
     />;
   }
@@ -155,7 +173,7 @@ class Monitor extends React.Component {
 
   render() {
     return(
-      <div>
+      <div className="Monitor">
         {this.renderStatus()}
         {this.renderButton()}
       </div>
