@@ -47,7 +47,7 @@ class Status extends React.Component {
 
   componentDidMount() {
     this.props.pollFn();
-    const pollIntervalMillis = 30000; // 30 seconds
+    const pollIntervalMillis = 60000; // 60 seconds
     this.timerId = setInterval(
       () => this.props.pollFn(),
       pollIntervalMillis
