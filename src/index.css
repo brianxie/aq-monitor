@@ -6,3 +6,12 @@ body {
 .Status {
   width: 4rem;
 }
+
+.StatusTransition-enter {
+  opacity: 0;
+}
+
+.StatusTransition-enter-active {
+  opacity: 1;
+  transition: opacity 300ms;
+}

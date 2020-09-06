@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {CSSTransition} from 'react-transition-group';
 import './index.css';
 
 // handleClick, count
@@ -197,6 +198,21 @@ class Monitor extends React.Component {
       </div>);
   }
 
+  renderStatusPlaceholder(statusActive, appearFn) {
+    // Exit animations wouldn't work, because of the immediate unrendering.
+    return(
+      <CSSTransition
+        in={statusActive}
+        appear={true}
+        classNames="StatusTransition"
+      >
+        <div>
+          {statusActive && appearFn}
+        </div>
+      </CSSTransition>
+    );
+  }
+
   render() {
     return(
       <div
@@ -204,7 +220,9 @@ class Monitor extends React.Component {
         class="container m-5"
       >
         {this.renderButton()}
-        {this.state.statusActive && this.renderStatus(this.updateStatusAndButton.bind(this))}
+        {this.renderStatusPlaceholder(
+          this.state.statusActive,
+          this.renderStatus(this.updateStatusAndButton.bind(this)))}
       </div>
     );
   }
