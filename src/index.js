@@ -8,6 +8,8 @@ class Button extends React.Component {
     return (
       <button
         className="Button"
+        type="button"
+        class="btn btn-outline-secondary btn-lg"
         onClick={() => this.props.handleClick()}
       >
         {"Number of times I've been updated: "}
@@ -21,12 +23,20 @@ class Button extends React.Component {
 class Status extends React.Component {
   render() {
     return (
-      <div className="Status">
-        <div className="AQI">
+      <div
+        className="Status"
+        class="card text-left border-secondary"
+      >
+        <div
+          className="AQI"
+          class="card-body"
+        >
           {this.props.aqiText}
         </div>
-        <br />
-        <div className="Position">
+        <div
+          className="Position"
+          class="card-body"
+        >
           {"Your position: "}
           {this.props.position}
         </div>
@@ -36,7 +46,7 @@ class Status extends React.Component {
 
   componentDidMount() {
     this.props.pollFn();
-    const pollIntervalMillis = 30000; // 30 second
+    const pollIntervalMillis = 30000; // 30 seconds
     this.timerId = setInterval(
       () => this.props.pollFn(),
       pollIntervalMillis
@@ -98,6 +108,7 @@ class Monitor extends React.Component {
   // Reads raw sensor results from purpleair.
   // Future function.
   getRawResults() {
+    return Promise.reject("TODO TESTING ONLY");
     const srcUrl = "https://www.purpleair.com/json";
     return fetch(srcUrl)
       .then(response => this.checkResponseOk(response))
@@ -162,11 +173,14 @@ class Monitor extends React.Component {
   }
 
   renderStatus(pollFn) {
-    return <Status
-      aqiText={this.state.aqiText}
-      position={this.state.position}
-      pollFn={pollFn}
-    />;
+    return(
+      <div class="container p-3">
+        <Status
+          aqiText={this.state.aqiText}
+          position={this.state.position}
+          pollFn={pollFn}
+        />
+      </div>);
   }
 
   toggleStatus() {
@@ -174,14 +188,21 @@ class Monitor extends React.Component {
   }
 
   renderButton() {
-    return <Button
-      count={this.state.count}
-      handleClick={() => this.toggleStatus()}/>;
+    return(
+      <div class="container p-3">
+        <Button
+          count={this.state.count}
+          handleClick={() => this.toggleStatus()}
+        />
+      </div>);
   }
 
   render() {
     return(
-      <div className="Monitor">
+      <div
+        className="Monitor"
+        class="container m-5"
+      >
         {this.renderButton()}
         {this.state.statusActive && this.renderStatus(this.updateStatusAndButton.bind(this))}
       </div>
