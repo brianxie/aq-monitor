@@ -10,7 +10,7 @@ class Button extends React.Component {
         className="Button"
         onClick={() => this.props.handleClick()}
       >
-        {"Number of times I've been clicked: "}
+        {"Number of times I've been updated: "}
         {this.props.count}
       </button>
     );
@@ -33,29 +33,32 @@ class Status extends React.Component {
       </div>
     );
   }
-}
-
-class Monitor extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      aqiText: "Default AQI text.",
-      count: 0,
-      position: "Default position.",
-    };
-  }
 
   componentDidMount() {
-    this.updateStatusAndButton();
+    this.props.pollFn();
     const pollIntervalMillis = 30000; // 30 second
     this.timerId = setInterval(
-      () => this.updateStatusAndButton(),
+      () => this.props.pollFn(),
       pollIntervalMillis
     );
   }
 
   componentWillUnmount() {
     clearInterval(this.timerId);
+  }
+
+}
+
+class Monitor extends React.Component {
+  // Global state for now, so I don't factor myself into a corner.
+  constructor(props) {
+    super(props);
+    this.state = {
+      count: 0,
+      statusActive: false,
+      aqiText: "Default AQI text.",
+      position: "Default position.",
+    };
   }
 
   // Transforms a result into an object containing the latitude, longitude, and result itself.
@@ -158,24 +161,29 @@ class Monitor extends React.Component {
       .catch(error => this.setState({aqiText: error.message}));
   }
 
-  renderStatus() {
+  renderStatus(pollFn) {
     return <Status
       aqiText={this.state.aqiText}
       position={this.state.position}
+      pollFn={pollFn}
     />;
+  }
+
+  toggleStatus() {
+    this.setState({statusActive: !this.state.statusActive});
   }
 
   renderButton() {
     return <Button
       count={this.state.count}
-      handleClick={() => this.updateStatusAndButton()}/>;
+      handleClick={() => this.toggleStatus()}/>;
   }
 
   render() {
     return(
       <div className="Monitor">
-        {this.renderStatus()}
         {this.renderButton()}
+        {this.state.statusActive && this.renderStatus(this.updateStatusAndButton.bind(this))}
       </div>
     );
   }
