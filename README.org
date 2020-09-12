@@ -1,6 +1,6 @@
 #+TITLE: aq-monitor
 
-Monitors air quality using [[https://github.com/brianxie/aq-monitor.git][PurpleAir sensor data]]. This tool uses the same [[https://www.airnow.gov/sites/default/files/custom-js/conc-aqi.js][AQI formula]] as the [[https://www.airnow.gov/aqi/aqi-calculator-concentration/][AirNow.gov calculator]].
+Monitors air quality using [[https://www2.purpleair.com/community/faq#!hc-access-the-json][PurpleAir sensor data]]. This tool uses the same [[https://www.airnow.gov/sites/default/files/custom-js/conc-aqi.js][AQI formula]] as the [[https://www.airnow.gov/aqi/aqi-calculator-concentration/][AirNow.gov calculator]].
 
 * Development
 #+begin_src
