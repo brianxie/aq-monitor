@@ -19,4 +19,8 @@ to deploy to Github Pages.
 ** Request location once and persist it, instead of requesting it on each iteration
 ** Display a refresh timer
 ** Add a manual refresh button
+** Reinstate the count
+** Have an actual alert
+** Support multiple timescale view
+** Update assets
 ** Make things look...not terribly ugly

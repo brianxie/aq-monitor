@@ -1,5 +1,14 @@
 import React from 'react';
 
+const window = {
+  REALTIME: "realtime",
+  TEN_MINUTES: "ten minutes",
+  THIRTY_MINUTES: "thirty minutes",
+  ONE_HOUR: "one hour",
+  SIX_HOURS: "six hours",
+  ONE_DAY: "one day",
+}
+
 // aqiText, position
 // keep count in here
 class Status extends React.Component {
@@ -7,8 +16,10 @@ class Status extends React.Component {
     super(props);
     this.state = {
       aqiText: this.props.aqiText,
+
       position: this.props.position,
       pm25_10min: null,
+      pm25_aqi: null,
     };
   }
 
@@ -18,12 +29,14 @@ class Status extends React.Component {
         className="Status"
         class="card text-left border-secondary"
       >
+
         <div
           className="AQI"
           class="card-body"
         >
           {this.state.aqiText}
         </div>
+
         <div
           className="Position"
           class="card-body"
@@ -31,13 +44,13 @@ class Status extends React.Component {
           {"Your position: "}
           {this.state.position || "Position unknown"}
         </div>
+
       </div>
     );
   }
 
   componentDidMount() {
     this.updateStatus();
-    // const pollIntervalMillis = 60000; // 60 seconds
     this.timerId = setInterval(
       () => this.updateStatus(),
       this.props.pollIntervalMillis
@@ -46,6 +59,9 @@ class Status extends React.Component {
 
   componentWillUnmount() {
     clearInterval(this.timerId);
+  }
+
+  generateResultText() {
   }
 
   // Transforms a result into an object containing the latitude, longitude, and result itself.
@@ -62,9 +78,8 @@ class Status extends React.Component {
 
   // Sorts results by distance, increasing.
   getSortedResults(taggedResults, position) {
-    return taggedResults.sort((a, b) => {
-      return this.distanceFromPosition(a, position) - this.distanceFromPosition(b, position);
-    })
+    return taggedResults.sort((a, b) =>
+      this.distanceFromPosition(a, position) - this.distanceFromPosition(b, position))
       .map(taggedResult => taggedResult.result);
   }
 
