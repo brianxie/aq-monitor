@@ -1,13 +1,36 @@
 import React from 'react';
+import Sensor from './Sensor';
 
-const window = {
+// Datatypes for constructing a sensor model.
+// This is an internal, non-rendered data representation.
+// The Sensor React component deals with actually using these fields.
+const TimeDataKeys = {
   REALTIME: "realtime",
-  TEN_MINUTES: "ten minutes",
-  THIRTY_MINUTES: "thirty minutes",
-  ONE_HOUR: "one hour",
-  SIX_HOURS: "six hours",
-  ONE_DAY: "one day",
+  TEN_MINUTES: "ten_minutes",
+  THIRTY_MINUTES: "thirty_minutes",
+  ONE_HOUR: "one_hour",
+  SIX_HOURS: "six_hours",
+  ONE_DAY: "one_day",
 }
+
+const LocationKeys = {
+  LATITUDE: "latitude",
+  LONGITUDE: "longitude",
+}
+
+class SensorModel {
+  constructor(timeData, locationData) {
+    this.timeData = timeData;
+    this.locationData = locationData;
+  }
+
+  toString() {
+    return this.timeData.toString() + "\n" + this.locationData.toString();
+  }
+}
+
+// Maximum number of sensors from which to consider data.
+const MAX_SENSORS = 3;
 
 // aqiText, position
 // keep count in here
@@ -17,9 +40,14 @@ class Status extends React.Component {
     this.state = {
       aqiText: this.props.aqiText,
 
-      position: this.props.position,
       pm25_10min: null,
       pm25_aqi: null,
+
+      // The individual sensors.
+      sensorModels: null,
+      // Current position
+      position: null,
+      timer: null,
     };
   }
 
@@ -31,11 +59,42 @@ class Status extends React.Component {
       >
 
         <div
+          className="ResultSection"
+          class="card-body"
+        >
+          {"Results section. This should include composite PM2.5 density, AQI, drill-down into multiple sensors."}
+        </div>
+
+        <div
+          className="PositionSection"
+          class="card-body"
+        >
+          {this.getPositionText() ||
+            "Position section. This should include current position, as well as a sub-button to update it manually."} 
+        </div>
+
+        <div
+          className="TimerSection"
+          class="card-body"
+        >
+          {"Timer section. This should include a running count on the current timer, as well as a sub-button to update it manually."} 
+        </div>
+
+
+        <div
           className="AQI"
           class="card-body"
         >
           {this.state.aqiText}
         </div>
+
+        <div
+          className="ScrewingAround"
+          class="card-body"
+        >
+          {this.state.sensorModels == null ? "No sensor data." : this.renderSensors()}
+        </div>
+
 
         <div
           className="Position"
@@ -61,7 +120,20 @@ class Status extends React.Component {
     clearInterval(this.timerId);
   }
 
-  generateResultText() {
+  renderSensors() {
+    if (this.sensorModels == null) {
+      return null;
+    }
+    console.log(this.sensorModels.toString());
+    return (this.sensorModels.map(model =>
+      <div class="container p-3">
+        <Sensor sensorModel={model} />
+      </div>
+    ));
+  }
+
+  getPositionText() {
+    return null;
   }
 
   // Transforms a result into an object containing the latitude, longitude, and result itself.
@@ -83,12 +155,37 @@ class Status extends React.Component {
       .map(taggedResult => taggedResult.result);
   }
 
-  // Returns the PM2.5 value for the closest result.
-  // This should really do more intelligent integration of multiple results.
-  handleFilteredResults(filteredResults) {
-    var stats = JSON.parse(filteredResults[0].Stats);
-    // Take ten-minute average.
-    return stats.v1;
+  constructSensorModels(sortedResults) {
+    return sortedResults.map(result => {
+      var stats = JSON.parse(result.Stats);
+
+      var locationData = {
+        [LocationKeys.LATITUDE]: parseFloat(result.Lat),
+        [LocationKeys.LONGITUDE]: parseFloat(result.Lon),
+        toString: function() {
+          return Object.keys(LocationKeys)
+            .map(key => LocationKeys[key])
+            .map(key => key + ": " + this[key].toString())
+            .reduce((acc, curr) => acc + "\n" + curr);
+        }
+      };
+      var timeData = {
+        [TimeDataKeys.REALTIME]: stats.v,
+        [TimeDataKeys.TEN_MINUTES]: stats.v1,
+        [TimeDataKeys.THIRTY_MINUTES]: stats.v2,
+        [TimeDataKeys.ONE_HOUR]: stats.v3,
+        [TimeDataKeys.SIX_HOURS]: stats.v4,
+        [TimeDataKeys.ONE_DAY]: stats.v5,
+        toString: function() {
+          return Object.keys(TimeDataKeys)
+            .map(key => TimeDataKeys[key])
+            .map(key => key + ": " + this[key].toString())
+            .reduce((acc, curr) => acc + "\n" + curr);
+        },
+      };
+
+      return new SensorModel(locationData, timeData);
+    });
   }
 
   checkResponseOk(response) {
@@ -158,8 +255,10 @@ class Status extends React.Component {
     // Compute PM2.5 and update UI.
     Promise.all([rawResultsPromise, positionPromise])
       .then(promises => this.getSortedResults(promises[0], promises[1]))
-      .then(filteredResults => this.handleFilteredResults(filteredResults))
-      .then(aqi => this.setState({aqiText: aqi}))
+      .then(sortedResults => sortedResults.slice(0, MAX_SENSORS))
+      .then(sortedResults => this.constructSensorModels(sortedResults))
+      //.then(sensorModels => this.setState({aqiText: sensorModels.toString()}))
+      .then(sensorModels => this.setState({sensorModels: sensorModels}))
       .catch(error => this.setState({aqiText: error.message}));
   }
 
