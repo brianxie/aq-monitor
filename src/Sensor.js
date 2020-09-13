@@ -17,6 +17,7 @@ export const LocationKeys = {
 
 export class SensorModel {
   constructor(timeData, locationData) {
+    // These could be classes, but having enumerable properties is convenient.
     this.timeData = timeData;
     this.locationData = locationData;
   }

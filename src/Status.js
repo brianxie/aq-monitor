@@ -22,8 +22,8 @@ function createTaggedResult(jsonResult) {
 // Computes distance between a single result and the provided position using
 // the Euclidean metric.
 function distanceFromPosition(taggedResult, position) {
-  var dLat = taggedResult.lat - position.coords.latitude;
-  var dLon = taggedResult.lon - position.coords.longitude;
+  var dLat = taggedResult.lat - position[Sensor.LocationKeys.LATITUDE];
+  var dLon = taggedResult.lon - position[Sensor.LocationKeys.LONGITUDE];
   return Math.sqrt(Math.pow(dLat, 2) + Math.pow(dLon, 2));
 }
 
@@ -32,6 +32,13 @@ function getSortedResults(taggedResults, position) {
   return taggedResults.sort((a, b) =>
     distanceFromPosition(a, position) - distanceFromPosition(b, position))
     .map(taggedResult => taggedResult.result);
+}
+
+function constructLocationData(latitude, longitude) {
+  return {
+      [Sensor.LocationKeys.LATITUDE]: latitude,
+      [Sensor.LocationKeys.LONGITUDE]: longitude,
+    };
 }
 
 // Transforms an array of results into an array of SensorModels.
@@ -47,10 +54,8 @@ function constructSensorModels(results) {
       [Sensor.TimeDataKeys.SIX_HOURS]: stats.v4,
       [Sensor.TimeDataKeys.ONE_DAY]: stats.v5,
     };
-    var locationData = {
-      [Sensor.LocationKeys.LATITUDE]: parseFloat(result.Lat),
-      [Sensor.LocationKeys.LONGITUDE]: parseFloat(result.Lon),
-    };
+    var locationData = constructLocationData(
+      parseFloat(result.Lat), parseFloat(result.Lon));
 
     return new Sensor.SensorModel(timeData, locationData);
   });
@@ -76,7 +81,7 @@ function getRawResults() {
 }
 
 // Maximum number of sensors from which to consider data.
-const MAX_SENSORS = 3;
+const MAX_SENSORS = 5;
 
 //
 // React component
@@ -92,7 +97,6 @@ class Status extends React.Component {
     };
   }
 
-  // timer :timer and sub button to update manually or pause or whatever
   render() {
     return (
       <div
@@ -127,7 +131,7 @@ class Status extends React.Component {
         >
           {<TimerComponent
             pollIntervalMillis={this.props.pollIntervalMillis}
-            callback={() => this.updateStatus(true)} />}
+            callback={() => this.updateStatus(false)} />}
         </div>
 
       </div>
@@ -161,31 +165,42 @@ class Status extends React.Component {
   // Fetches location and sensor readings, and updates the status.
   updateStatus(refreshLocation) {
     console.log("[" + new Date() + "] updating...");
+
     this.setState({sensorModels: ResponseUtils.ResponsePending()});
-    this.setState({position: ResponseUtils.ResponsePending()});
 
-    // Issue requests for position and sensor readings.
-    var positionPromise = function (options) {
-        return new Promise(function(resolve, reject) {
-          navigator.geolocation.getCurrentPosition(resolve, reject, options);
-        });
-    }();
-    var rawResultsPromise = getRawResults();
+    var positionPromise;
 
-    // Check for errors in fetching position, and update eagerly if possible.
-    positionPromise = positionPromise
-      .then(position => {
-        var positionString =
-          position.coords.latitude.toString()
-            + ", "
-            + position.coords.longitude.toString();
-        this.setState({position: ResponseUtils.ResponseSuccess(positionString)});
-        // Return the original position, so that subsequent logic can work with it.
-        // Pretty-print is only for UI purposes.
-        return position;
-      })
+    var hasPreviousPosition =
+      (this.state.position != null &&
+        this.state.position[ResponseUtils.ResponseProperties.TAG] ===
+        ResponseUtils.ResponseStates.SUCCESS);
+
+    if (!refreshLocation && hasPreviousPosition) {
+      positionPromise = Promise.resolve(
+        this.state.position[ResponseUtils.ResponseProperties.VALUE]);
+    } else {
+      this.setState({position: ResponseUtils.ResponsePending()});
+      // Issue requests for position and sensor readings.
+      positionPromise = function (options) {
+          return new Promise(function(resolve, reject) {
+            navigator.geolocation.getCurrentPosition(resolve, reject, options);
+          });
+      }()
+        .then(position =>
+          constructLocationData(
+            parseFloat(position.coords.latitude),
+            parseFloat(position.coords.longitude)))
+        .then(position => {
+          this.setState({
+            position: ResponseUtils.ResponseSuccess(position)
+          });
+          // Return the original position, so that subsequent logic can work with it.
+          return position;
+        })
       .catch(error => this.handlePositionError(error));
+    }
 
+    var rawResultsPromise = getRawResults();
     // Check for errors with the sensor reading per se, because Promise.all fails
     // fast.
     // Update eagerly if there's a failure.

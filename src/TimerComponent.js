@@ -44,6 +44,7 @@ class TimerComponent extends React.Component {
     );
   }
 
+  // TODO: pause, etc
   updateTimer(deltaMillis, defaultDuration) {
     var newDuration = this.state.timer.remainingTimeMillis - deltaMillis;
     var timerState = newDuration <= 0

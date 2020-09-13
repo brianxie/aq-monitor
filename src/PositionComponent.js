@@ -1,5 +1,6 @@
 import React from 'react';
 import * as ResponseUtils from './ResponseUtils';
+import * as Sensor from './Sensor';
 
 // props::position
 class PositionComponent extends React.Component {
@@ -22,7 +23,9 @@ class PositionComponent extends React.Component {
     var tag = position[ResponseUtils.ResponseProperties.TAG];
     switch (tag) {
       case ResponseUtils.ResponseStates.SUCCESS:
-        return "Postion: " + position[ResponseUtils.ResponseProperties.VALUE];
+        return "Postion: " +
+          this.parsePositionValue(
+            position[ResponseUtils.ResponseProperties.VALUE]);
       case ResponseUtils.ResponseStates.FAILURE:
         return "Error: " + position[ResponseUtils.ResponseProperties.ERR];
       case ResponseUtils.ResponseStates.PENDING:
@@ -30,6 +33,12 @@ class PositionComponent extends React.Component {
       default:
         throw new Error("Unrecognized tag: " + tag.toString());
     }
+  }
+
+  parsePositionValue(positionValue) {
+    return "Latitude: " + positionValue[Sensor.LocationKeys.LATITUDE].toString()
+      + " "
+      + "Longitude: " + positionValue[Sensor.LocationKeys.LONGITUDE].toString();
   }
 }
 
