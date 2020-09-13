@@ -30,32 +30,21 @@ class SensorModel {
   }
 }
 
+const TimerState = {
+  RUNNING: "running",
+  PAUSED: "paused",
+  EXPIRED: "expired",
+}
+
 class Timer {
-  constructor(remainingTimeMillis, defaultIntervalMillis, callback) {
+  constructor(timerState, remainingTimeMillis) {
+    this.timerState = timerState;
     this.remainingTimeMillis = remainingTimeMillis;
-    this.defaultIntervalMillis = defaultIntervalMillis;
-    this.callback = callback;
+    console.log(timerState.toString() + remainingTimeMillis.toString());
   }
 
-  tick(duration) {
-    var newRemainingTimeMillis = this.remainingTimeMillis - duration;
-    this.remainingTimeMillis = newRemainingTimeMillis;
-    this.checkDone(newRemainingTimeMillis);
-  }
-
-  checkDone(remaining) {
-    if (remaining <= 0) {
-      this.callback();
-      this.reset(this.defaultIntervalMillis);
-    }
-  }
-
-  reset(durationMillis) {
-    this.remainingTimeMillis = durationMillis;
-  }
-
-  display() {
-    return this.remainingTimeMillis;
+  toString() {
+    return "state: " + this.timerState + " time: " + this.remainingTimeMillis;
   }
 }
 
@@ -148,7 +137,7 @@ class Status extends React.Component {
 
   // some catchall
   // results: aqi, density, drilldown
-  // timer :timer
+  // timer :timer and sub button to update manually or pause or whatever
   // position
   render() {
     return (
@@ -182,7 +171,7 @@ class Status extends React.Component {
           className="TimerSection"
           class="card-body"
         >
-          {"Timer section. This should include a running count on the current timer, as well as a sub-button to update it manually."} 
+          {this.renderTimer() || "no timer"} 
         </div>
 
 
@@ -191,10 +180,18 @@ class Status extends React.Component {
   }
 
   componentDidMount() {
-    this.updateStatus();
+    this.updateStatus(true);
+    const tickInterval = 1000;
+    this.setState({timer: new Timer(
+      TimerState.RUNNING,
+      this.props.pollIntervalMillis)}
+    );
+
     this.timerId = setInterval(
-      () => this.updateStatus(),
-      this.props.pollIntervalMillis
+      () => this.updateTimer(
+        tickInterval,
+        this.props.pollIntervalMillis),
+      tickInterval
     );
   }
 
@@ -202,6 +199,27 @@ class Status extends React.Component {
     clearInterval(this.timerId);
   }
 
+  updateTimer(deltaDuration, defaultDuration) {
+    var newDuration = this.state.timer.remainingTimeMillis - deltaDuration;
+    var timerState = newDuration <= 0 ? TimerState.EXPIRED : TimerState.RUNNING;
+    // write a new timer (so the render function gets called again);
+    this.setState({timer: new Timer(timerState, newDuration)});
+    // call the update method if need be
+    if (timerState == TimerState.EXPIRED) {
+      this.updateStatus(true);
+      this.setState({timer: new Timer(TimerState.RUNNING, defaultDuration)});
+    }
+  }
+
+  renderTimer() {
+    var timer = this.state.timer;
+    if (timer == null) {
+      return null;
+    }
+    return timer.toString();
+  }
+
+  // TODO don't refetch location
   renderSensors() {
     var sensorModels = this.state.sensorModels;
     if (sensorModels == null) {
@@ -256,7 +274,7 @@ class Status extends React.Component {
   }
 
   // Fetches location and sensor readings, and updates the status.
-  updateStatus() {
+  updateStatus(refreshLocation) {
     console.log("[" + new Date() + "] updating...");
     this.setState({sensorModels: ResponseUtils.ResponsePending()});
     this.setState({position: ResponseUtils.ResponsePending()});
