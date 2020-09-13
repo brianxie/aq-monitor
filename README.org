@@ -4,13 +4,13 @@ Monitors air quality using [[https://www2.purpleair.com/community/faq#!hc-access
 
 * Development
 #+begin_src
-`HTTPS=true npm start`
+HTTPS=true npm start
 #+end_src
 
 then open in [[https://localhost:3000][https://localhost:3000]].
 
 #+begin_src
-`npm run deploy`
+npm run deploy
 #+end_src
 
 to deploy to Github Pages.
