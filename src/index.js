@@ -43,13 +43,10 @@ class Monitor extends React.Component {
   }
 
   renderStatus() {
-    const defaultAqiText = "Default AQI text.";
     const pollIntervalMillis = 60000; // 60 seconds
     return(
       <div class="container p-3">
         <Status
-          aqiText={defaultAqiText}
-          position={null}
           pollIntervalMillis={pollIntervalMillis}
         />
       </div>);
