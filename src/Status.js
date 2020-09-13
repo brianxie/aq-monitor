@@ -1,6 +1,7 @@
 import React from 'react';
 import Sensor from './Sensor';
 import * as ResponseUtils from './ResponseUtils';
+import * as TimeUtils from './TimeUtils';
 
 // Datatypes for constructing a sensor model.
 // This is an internal, non-rendered data representation.
@@ -27,24 +28,6 @@ class SensorModel {
 
   toString() {
     return this.timeData.toString() + "\n" + this.locationData.toString();
-  }
-}
-
-const TimerState = {
-  RUNNING: "running",
-  PAUSED: "paused",
-  EXPIRED: "expired",
-}
-
-class Timer {
-  constructor(timerState, remainingTimeMillis) {
-    this.timerState = timerState;
-    this.remainingTimeMillis = remainingTimeMillis;
-    console.log(timerState.toString() + remainingTimeMillis.toString());
-  }
-
-  toString() {
-    return "state: " + this.timerState + " time: " + this.remainingTimeMillis;
   }
 }
 
@@ -182,8 +165,8 @@ class Status extends React.Component {
   componentDidMount() {
     this.updateStatus(true);
     const tickInterval = 1000;
-    this.setState({timer: new Timer(
-      TimerState.RUNNING,
+    this.setState({timer: new TimeUtils.Timer(
+      TimeUtils.TimerState.RUNNING,
       this.props.pollIntervalMillis)}
     );
 
@@ -201,13 +184,15 @@ class Status extends React.Component {
 
   updateTimer(deltaDuration, defaultDuration) {
     var newDuration = this.state.timer.remainingTimeMillis - deltaDuration;
-    var timerState = newDuration <= 0 ? TimerState.EXPIRED : TimerState.RUNNING;
+    var timerState = newDuration <= 0
+      ? TimeUtils.TimerState.EXPIRED
+      : TimeUtils.TimerState.RUNNING;
     // write a new timer (so the render function gets called again);
-    this.setState({timer: new Timer(timerState, newDuration)});
+    this.setState({timer: new TimeUtils.Timer(timerState, newDuration)});
     // call the update method if need be
-    if (timerState == TimerState.EXPIRED) {
+    if (timerState == TimeUtils.TimerState.EXPIRED) {
       this.updateStatus(true);
-      this.setState({timer: new Timer(TimerState.RUNNING, defaultDuration)});
+      this.setState({timer: new TimeUtils.Timer(TimeUtils.TimerState.RUNNING, defaultDuration)});
     }
   }
 
