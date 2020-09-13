@@ -1,6 +1,7 @@
 import React from 'react';
-import SensorsComponent from './SensorsComponent';
 import PositionComponent from './PositionComponent';
+import SensorsComponent from './SensorsComponent';
+import TimerComponent from './TimerComponent';
 import * as Sensor from './Sensor';
 import * as ResponseUtils from './ResponseUtils';
 import * as TimeUtils from './TimeUtils';
@@ -125,57 +126,21 @@ class Status extends React.Component {
           className="TimerSection"
           class="card-body"
         >
-          {this.renderTimer() || "no timer"} 
+          {<TimerComponent
+            pollIntervalMillis={this.props.pollIntervalMillis}
+            callback={() => this.updateStatus(true)} />}
         </div>
 
       </div>
     );
   }
 
-  // TODO: clean this up
+  // Initial update on render update on render.
   componentDidMount() {
     this.updateStatus(true);
-    const tickInterval = 1000;
-    this.setState({timer: new TimeUtils.Timer(
-      TimeUtils.TimerState.RUNNING,
-      this.props.pollIntervalMillis)}
-    );
-
-    this.timerId = setInterval(
-      () => this.updateTimer(
-        tickInterval,
-        this.props.pollIntervalMillis),
-      tickInterval
-    );
   }
 
-  // TODO: clean this up
   componentWillUnmount() {
-    clearInterval(this.timerId);
-  }
-
-  // TODO: clean this up
-  updateTimer(deltaDuration, defaultDuration) {
-    var newDuration = this.state.timer.remainingTimeMillis - deltaDuration;
-    var timerState = newDuration <= 0
-      ? TimeUtils.TimerState.EXPIRED
-      : TimeUtils.TimerState.RUNNING;
-    // write a new timer (so the render function gets called again);
-    this.setState({timer: new TimeUtils.Timer(timerState, newDuration)});
-    // call the update method if need be
-    if (timerState === TimeUtils.TimerState.EXPIRED) {
-      this.updateStatus(true);
-      this.setState({timer: new TimeUtils.Timer(TimeUtils.TimerState.RUNNING, defaultDuration)});
-    }
-  }
-
-  // TODO: clean this up
-  renderTimer() {
-    var timer = this.state.timer;
-    if (timer == null) {
-      return null;
-    }
-    return timer.toString();
   }
 
   // Handles errors in sensor fetching.

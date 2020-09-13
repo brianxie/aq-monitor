@@ -22,9 +22,6 @@ export class SensorModel {
   }
 
   toString() {
-    Object.keys(LocationKeys)
-      .forEach(keyEnum => console.log(LocationKeys[keyEnum]));
-
     var locationString =
         Object.keys(LocationKeys)
           .map(keyEnum => LocationKeys[keyEnum])

@@ -9,7 +9,6 @@ export class Timer {
   constructor(timerState, remainingTimeMillis) {
     this.timerState = timerState;
     this.remainingTimeMillis = remainingTimeMillis;
-    console.log(timerState.toString() + remainingTimeMillis.toString());
   }
 
   toString() {
