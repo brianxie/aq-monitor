@@ -1,23 +1,23 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "a4dfbe1d61956e0a129dd179281bc006",
+    "revision": "287bc9f9b07c9567cae934b11f9ffd3c",
     "url": "/aq-monitor/index.html"
   },
   {
-    "revision": "c207e66f530f31daae38",
+    "revision": "5c564cf34394e84a478f",
     "url": "/aq-monitor/static/css/main.17f059be.chunk.css"
   },
   {
-    "revision": "54cc7a933e52b8375445",
-    "url": "/aq-monitor/static/js/2.ec6d71b8.chunk.js"
+    "revision": "344eead0b631c28c8669",
+    "url": "/aq-monitor/static/js/2.28f2ed9a.chunk.js"
   },
   {
     "revision": "e88a3e95b5364d46e95b35ae8c0dc27d",
-    "url": "/aq-monitor/static/js/2.ec6d71b8.chunk.js.LICENSE.txt"
+    "url": "/aq-monitor/static/js/2.28f2ed9a.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "c207e66f530f31daae38",
-    "url": "/aq-monitor/static/js/main.166aec14.chunk.js"
+    "revision": "5c564cf34394e84a478f",
+    "url": "/aq-monitor/static/js/main.fac4c632.chunk.js"
   },
   {
     "revision": "7434c941c1ec29e74772",

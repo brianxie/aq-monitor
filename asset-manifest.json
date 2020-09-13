@@ -1,22 +1,22 @@
 {
   "files": {
     "main.css": "/aq-monitor/static/css/main.17f059be.chunk.css",
-    "main.js": "/aq-monitor/static/js/main.166aec14.chunk.js",
-    "main.js.map": "/aq-monitor/static/js/main.166aec14.chunk.js.map",
+    "main.js": "/aq-monitor/static/js/main.fac4c632.chunk.js",
+    "main.js.map": "/aq-monitor/static/js/main.fac4c632.chunk.js.map",
     "runtime-main.js": "/aq-monitor/static/js/runtime-main.44834d90.js",
     "runtime-main.js.map": "/aq-monitor/static/js/runtime-main.44834d90.js.map",
-    "static/js/2.ec6d71b8.chunk.js": "/aq-monitor/static/js/2.ec6d71b8.chunk.js",
-    "static/js/2.ec6d71b8.chunk.js.map": "/aq-monitor/static/js/2.ec6d71b8.chunk.js.map",
+    "static/js/2.28f2ed9a.chunk.js": "/aq-monitor/static/js/2.28f2ed9a.chunk.js",
+    "static/js/2.28f2ed9a.chunk.js.map": "/aq-monitor/static/js/2.28f2ed9a.chunk.js.map",
     "index.html": "/aq-monitor/index.html",
-    "precache-manifest.b583893d4756d4b1af2cfc55428e3040.js": "/aq-monitor/precache-manifest.b583893d4756d4b1af2cfc55428e3040.js",
+    "precache-manifest.6b6dcdcc864311fb775105db353c6737.js": "/aq-monitor/precache-manifest.6b6dcdcc864311fb775105db353c6737.js",
     "service-worker.js": "/aq-monitor/service-worker.js",
     "static/css/main.17f059be.chunk.css.map": "/aq-monitor/static/css/main.17f059be.chunk.css.map",
-    "static/js/2.ec6d71b8.chunk.js.LICENSE.txt": "/aq-monitor/static/js/2.ec6d71b8.chunk.js.LICENSE.txt"
+    "static/js/2.28f2ed9a.chunk.js.LICENSE.txt": "/aq-monitor/static/js/2.28f2ed9a.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.44834d90.js",
-    "static/js/2.ec6d71b8.chunk.js",
+    "static/js/2.28f2ed9a.chunk.js",
     "static/css/main.17f059be.chunk.css",
-    "static/js/main.166aec14.chunk.js"
+    "static/js/main.fac4c632.chunk.js"
   ]
 }
