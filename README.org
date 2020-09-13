@@ -16,13 +16,9 @@ then open in [[https://localhost:3000][https://localhost:3000]].
 to deploy to Github Pages.
 
 * Things to do
-- Incorporate the AQI formula
-- Make the components more modular
-- Request location once and persist it, instead of requesting it on each iteration
-- Display a refresh timer
 - Add a manual refresh button
 - Reinstate the count
 - Have an actual alert
 - Support multiple timescale view
 - Update assets
-- Make things look...not terribly ugly
+- Make things look...not terribly ugly (aka unbreak CSS)
