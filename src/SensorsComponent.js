@@ -10,11 +10,10 @@ function computeAQI() {
 class SensorsComponent extends React.Component {
   render() {
     return (
-        <div
-          class="card-body"
-        >
-          {this.getSensorsText()}
-        </div>);
+      <div class="card-body">
+        {this.getSensorsText()}
+      </div>
+    );
   }
 
   getSensorsText() {
@@ -24,10 +23,11 @@ class SensorsComponent extends React.Component {
     }
     var tag = sensorModels[ResponseUtils.ResponseProperties.TAG];
     switch (tag) {
+      // TODO: this is gnarly
       case ResponseUtils.ResponseStates.SUCCESS:
-        return sensorModels[ResponseUtils.ResponseProperties.VALUE]
-          .map(model => this.getSingleSensorText(model))
-          .reduce((acc, curr) => acc + "\n" + curr);
+        var parsedSensors = sensorModels[ResponseUtils.ResponseProperties.VALUE]
+          .map(model => this.getSingleSensorElem(model));
+        return parsedSensors;
       case ResponseUtils.ResponseStates.FAILURE:
         return "Error: " + sensorModels[ResponseUtils.ResponseProperties.ERR];
       case ResponseUtils.ResponseStates.PENDING:
@@ -37,8 +37,12 @@ class SensorsComponent extends React.Component {
     }
   }
 
-  getSingleSensorText(sensorModel) {
-    return sensorModel.toString();
+  getSingleSensorElem(sensorModel) {
+    return (
+      <div class="card-body">
+        {sensorModel.toString()}
+      </div>
+    );
   }
 }
 

@@ -7,7 +7,7 @@ class PositionComponent extends React.Component {
     return (
       <div
         className="PositionComponent"
-        class="card text-left border-secondary"
+        class="card-body"
       >
         {this.getPositionString()}
       </div>

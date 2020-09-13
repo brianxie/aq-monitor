@@ -12,6 +12,8 @@ export class Timer {
   }
 
   toString() {
-    return "state: " + this.timerState + " time: " + this.remainingTimeMillis;
+    return "Timer state: " + this.timerState + "\n"
+      + "Time remaining (seconds): "
+      + Math.floor(this.remainingTimeMillis / 1000);
   }
 }

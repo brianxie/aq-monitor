@@ -4,7 +4,6 @@ import SensorsComponent from './SensorsComponent';
 import TimerComponent from './TimerComponent';
 import * as Sensor from './Sensor';
 import * as ResponseUtils from './ResponseUtils';
-import * as TimeUtils from './TimeUtils';
 
 //
 // Helper methods

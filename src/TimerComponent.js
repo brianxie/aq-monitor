@@ -35,7 +35,10 @@ class TimerComponent extends React.Component {
 
   render() {
     return (
-      <div>
+      <div
+        className="TimerComponent"
+        class="card-body"
+      >
         {this.renderTimer()}
       </div>
     );
