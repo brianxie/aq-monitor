@@ -2,6 +2,7 @@ export const TimerState = {
   RUNNING: "running",
   PAUSED: "paused",
   EXPIRED: "expired",
+  INACTIVE: "inactive",
 }
 
 export class Timer {
