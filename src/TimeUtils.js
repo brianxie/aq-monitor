@@ -60,10 +60,11 @@ export class Timer {
     return this;
   }
 
-  // TODO: fix string
-  toString() {
-    return "Timer state: " + this.timerState + "\n"
-      + "Time remaining (seconds): "
-      + Math.floor(this.remainingTimeMillis / 1000);
+  getState() {
+    return this.timerState;
+  }
+
+  getRemainingTime() {
+    return Math.floor(this.remainingTimeMillis / 1000);
   }
 }

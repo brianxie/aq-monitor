@@ -6,7 +6,7 @@ class Button extends React.Component {
   render() {
     return (
       <button
-        className="btn btn-outline-secondary btn-lg"
+        className="btn btn-outline-dark btn-sm"
         type="button"
         onClick={() => this.props.handleClick()}
       >

@@ -1,7 +1,6 @@
 import React from 'react';
 import Button from './Button';
 import * as TimeUtils from './TimeUtils';
-import * as MarkupUtils from './MarkupUtils';
 
 // props::callback
 // props::pollIntervalMillis
@@ -37,7 +36,7 @@ class TimerComponent extends React.Component {
 
   render() {
     return (
-      <div className="card border-secondary">
+      <div className="card border-secondary TimerComponent">
         {this.renderTimer()}
         {this.renderButtonGroup()}
       </div>
@@ -58,10 +57,19 @@ class TimerComponent extends React.Component {
 
   renderTimer() {
     var timer = this.state.timer;
-    if (timer == null) {
-      return MarkupUtils.wrapInContainer("No timer present");
-    }
-    return MarkupUtils.wrapInContainer(timer.toString());
+    var timerText = (timer == null)
+      ? "No timer present"
+      : timer.getRemainingTime();
+
+    return (
+      <div className="container">
+        <h2>
+          <span className="badge badge-secondary">
+            {timerText}
+          </span>
+        </h2>
+      </div>
+    );
   }
 
   renderButtonGroup() {

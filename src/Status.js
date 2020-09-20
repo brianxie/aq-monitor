@@ -79,31 +79,19 @@ class Status extends React.Component {
 
   render() {
     return (
-      <div className="container">
-        <div className="container">
-          {
-            "TODO:\n \
-              - Fix toString() methods\n \
-              - Add sensor refresh button\n \
-              - Add timer reset button \n \
-              - Make CSS transitions work, maybe?\n \
-              - Alert on threshold \
-            "
-          }
-        </div>
+      <div className="container Status">
+        {<SensorsComponent
+          sensorModelsResult={this.state.sensorModelsResult}
+          positionResult={this.state.positionResult}
+          updateFn={() => this.updateStatusAsync(false)} />}
 
-          {<SensorsComponent
-            sensorModelsResult={this.state.sensorModelsResult}
-            positionResult={this.state.positionResult}
-            updateFn={() => this.updateStatusAsync(false)} />}
+        {<PositionComponent
+          positionResult={this.state.positionResult}
+          updateFn={() => this.updatePositionAsync()} />}
 
-          {<PositionComponent
-            positionResult={this.state.positionResult}
-            updateFn={() => this.updatePositionAsync()} />}
-
-          {<TimerComponent
-            pollIntervalMillis={this.props.pollIntervalMillis}
-            callback={() => this.updateStatusAsync(false)} />}
+        {<TimerComponent
+          pollIntervalMillis={this.props.pollIntervalMillis}
+          callback={() => this.updateStatusAsync(false)} />}
       </div>
     );
   }

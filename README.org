@@ -15,10 +15,7 @@ npm run deploy
 
 to deploy to Github Pages.
 
-* Things to do
-- Add a manual refresh button
-- Reinstate the count
-- Have an actual alert
-- Support multiple timescale view
-- Update assets
-- Make things look...not terribly ugly (aka unbreak CSS)
+* TODOs
+- Alert modal
+- Timer progress bar
+- Better CSS

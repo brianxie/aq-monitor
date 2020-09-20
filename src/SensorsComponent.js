@@ -98,7 +98,7 @@ function wrapSensorModelWithDistance(sensorModel, position) {
 class SensorsComponent extends React.Component {
   render() {
     return (
-      <div className="card border-secondary">
+      <div className="card border-secondary SensorsComponent">
         {this.getClosestSensorsElements(MAX_SENSORS)}
         {this.renderButton()}
       </div>
@@ -161,12 +161,11 @@ class SensorsComponent extends React.Component {
         + positionTag.toString() + " | " + sensorModelsTag.toString());
   }
 
-  // TODO: leverage SensorModel::toString
   computeAndFormatScore(sensorWithDistance) {
     return (
-      <div className="container">
+      <div className="container Sensor">
         <div className="badge badge-secondary">
-          {computeAQIPM25(sensorWithDistance["sensorModel"].timeData[Sensor.TimeDataKeys.REALTIME])}
+          {computeAQIPM25(sensorWithDistance["sensorModel"].getRealtimeConcentration())}
         </div>
         <div className="badge badge-secondary">
           {sensorWithDistance["distance"]}

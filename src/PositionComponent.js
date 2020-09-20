@@ -9,7 +9,7 @@ import * as MarkupUtils from './MarkupUtils';
 class PositionComponent extends React.Component {
   render() {
     return (
-      <div className="card border-secondary">
+      <div className="card border-secondary PositionComponent">
         {this.renderCurrentPositionElement()}
         {this.renderButton()}
       </div>
@@ -48,12 +48,17 @@ class PositionComponent extends React.Component {
     }
   }
 
-  // TODO: fix string
   parsePositionValue(positionValue) {
-    return "Latitude: "
-      + positionValue[Sensor.PositionKeys.LATITUDE].toString()
-      + " Longitude: "
-      + positionValue[Sensor.PositionKeys.LONGITUDE].toString();
+    return (
+      <ul className="list-group list-group-flush">
+        <li className="list-group-item">
+          Latitude: {positionValue[Sensor.PositionKeys.LATITUDE].toString()}
+        </li>
+        <li className="list-group-item">
+          Longitude: {positionValue[Sensor.PositionKeys.LONGITUDE].toString()}
+        </li>
+      </ul>
+    );
   }
 }
 

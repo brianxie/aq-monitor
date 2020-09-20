@@ -3,10 +3,6 @@ body {
   margin: auto;
 }
 
-.Status {
-  width: 4rem;
-}
-
 .StatusTransition-enter {
   opacity: 0;
 }

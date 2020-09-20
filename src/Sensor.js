@@ -22,20 +22,15 @@ export class SensorModel {
     this.positionData = positionData;
   }
 
-  // TODO: fix string
-  toString() {
-    var positionString =
-        Object.keys(PositionKeys)
-          .map(keyEnum => PositionKeys[keyEnum])
-          .map(key => key.toString() + ": " + this.positionData[key].toString())
-          .reduce((acc, curr) => acc + "\n" + curr);
-      
-    var timeDataString =
-        Object.keys(TimeDataKeys)
-          .map(keyEnum => TimeDataKeys[keyEnum])
-          .map(key => key.toString() + ": " + this.timeData[key].toString())
-          .reduce((acc, curr) => acc + "\n" + curr);
+  getRealtimeConcentration() {
+    return this.timeData[TimeDataKeys.REALTIME];
+  }
 
-    return positionString + "\n" + timeDataString;
+  getLatitude() {
+    return this.positionData[PositionKeys.LATITUDE];
+  }
+
+  getLongitude() {
+    return this.positionData[PositionKeys.LONGITUDE];
   }
 }
