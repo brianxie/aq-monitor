@@ -149,11 +149,13 @@ class SensorsComponent extends React.Component {
       // All successful.
       var position = positionResult[ResponseUtils.ResponseProperties.VALUE];
       var sensorModels = sensorModelsResult[ResponseUtils.ResponseProperties.VALUE];
+
+      // TODO: The sorting can be cached in state.
       return sensorModels
         .map(sensorModel => wrapSensorModelWithDistance(sensorModel, position))
         .sort((a, b) => a["distance"] - b["distance"])
         .slice(0, limit)
-        .map(sensorWithDistance => this.computeAndFormatScore(sensorWithDistance));
+        .map(sensorWithDistance => this.computeAndFormatSensor(sensorWithDistance));
     }
 
     throw new Error(
@@ -161,15 +163,16 @@ class SensorsComponent extends React.Component {
         + positionTag.toString() + " | " + sensorModelsTag.toString());
   }
 
-  computeAndFormatScore(sensorWithDistance) {
+  computeAndFormatSensor(sensorWithDistance) {
+    var aqi = computeAQIPM25(
+      sensorWithDistance["sensorModel"].getRealtimeConcentration());
     return (
       <div className="container Sensor">
-        <div className="badge badge-secondary">
-          {computeAQIPM25(sensorWithDistance["sensorModel"].getRealtimeConcentration())}
-        </div>
-        <div className="badge badge-secondary">
-          {sensorWithDistance["distance"]}
-        </div>
+        <h2>
+          {MarkupUtils.severityBadgeOf(aqi.toFixed(0))}
+        </h2>
+        {" "}
+        ({sensorWithDistance["distance"].toFixed(2).toString()}km from you)
       </div>
     );
   }

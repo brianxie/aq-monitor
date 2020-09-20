@@ -15,3 +15,20 @@ export function wrapInContainer(text) {
     </div >
   );
 }
+
+export function severityBadgeOf(aqi) {
+  var badgeTag;
+  if (aqi <= 50) {
+    badgeTag = "success";
+  } else if (aqi <= 150) {
+    badgeTag = "warning";
+  } else {
+    badgeTag = "danger";
+  }
+
+  return (
+    <div className={"badge badge-" + badgeTag}>
+      {aqi.toString()}
+    </div>
+  );
+}
