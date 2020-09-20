@@ -17,9 +17,10 @@ class Monitor extends React.Component {
     return(
       <div class="container p-3">
         <Button
-          handleClick={() => this.toggleStatus()}
-        />
-      </div>);
+          text={"Placeholder expand/collapse"}
+          handleClick={() => this.toggleStatus()}/>
+      </div>
+    );
   }
 
   toggleStatus() {
@@ -47,9 +48,9 @@ class Monitor extends React.Component {
     return(
       <div class="container p-3">
         <Status
-          pollIntervalMillis={pollIntervalMillis}
-        />
-      </div>);
+          pollIntervalMillis={pollIntervalMillis} />
+      </div>
+    );
   }
 
   render() {

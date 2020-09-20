@@ -1,8 +1,10 @@
 import React from 'react';
 import * as ResponseUtils from './ResponseUtils';
 import * as Sensor from './Sensor';
+import Button from './Button';
 
 // props::positionResult
+// props::updateFn
 class PositionComponent extends React.Component {
   render() {
     return (
@@ -11,6 +13,18 @@ class PositionComponent extends React.Component {
         class="card-body"
       >
         {this.getPositionString()}
+        {this.renderButton()}
+      </div>
+    );
+  }
+
+  renderButton() {
+    return(
+      <div class="container p-3">
+        <Button
+          text={"Refresh location"}
+          handleClick={() => this.props.updateFn()}
+        />
       </div>
     );
   }
@@ -20,6 +34,7 @@ class PositionComponent extends React.Component {
     if (positionResult == null) {
       return "Position unknown";
     }
+
     var tag = positionResult[ResponseUtils.ResponseProperties.TAG];
     switch (tag) {
       case ResponseUtils.ResponseStates.SUCCESS:

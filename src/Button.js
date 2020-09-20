@@ -1,7 +1,7 @@
 import React from 'react';
 
-// handleClick
-// TODO: add the text
+// props::handleClick
+// props::text
 class Button extends React.Component {
   render() {
     return (
@@ -11,7 +11,7 @@ class Button extends React.Component {
         class="btn btn-outline-secondary btn-lg"
         onClick={() => this.props.handleClick()}
       >
-        {"Placeholder text expand/collapse"}
+        {this.props.text}
       </button>
     );
   }

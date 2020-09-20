@@ -52,7 +52,7 @@ function checkResponseOk(response) {
 // Future function.
 // The fetched result is JSON-formatted and contains metadata followed by a
 // single "results" array.
-function getRawResults() {
+function getSensorResults() {
   const srcUrl = "https://www.purpleair.com/json";
   return fetch(srcUrl)
     .then(response => checkResponseOk(response))
@@ -104,7 +104,9 @@ class Status extends React.Component {
           className="Position"
           class="card-body"
         >
-          {<PositionComponent positionResult={this.state.positionResult} />}
+          {<PositionComponent
+            positionResult={this.state.positionResult}
+            updateFn={() => this.updatePositionAsync()} />}
         </div>
 
         <div
@@ -113,7 +115,7 @@ class Status extends React.Component {
         >
           {<TimerComponent
             pollIntervalMillis={this.props.pollIntervalMillis}
-            callback={() => this.updateStatus(false)} />}
+            callback={() => this.updateStatusAsync(false)} />}
         </div>
 
       </div>
@@ -122,88 +124,84 @@ class Status extends React.Component {
 
   // Initial update on render.
   componentDidMount() {
-    this.updateStatus(true);
+    this.updateStatusAsync(true);
   }
 
   componentWillUnmount() {
-  }
-
-  // Handles errors in sensor fetching.
-  handleResultError(error) {
-    const resultErrorString = "Error in fetching sensors: " + error.message;
-    this.setState({sensorModelsResult: ResponseUtils.ResponseFailure(resultErrorString)});
-    // Rethrow the error for subsequent nodes.
-    throw new Error(resultErrorString);
   }
 
   // Handles errors in position fetching.
   handlePositionError(error) {
     const positionErrorString = "Error in fetching position: " + error.message;
     this.setState({positionResult: ResponseUtils.ResponseFailure(positionErrorString)});
-    // Rethrow the error for subsequent nodes.
-    throw new Error(positionErrorString);
+  }
+
+  // Handles errors in sensor fetching.
+  handleResultError(error) {
+    const sensorModelsErrorString = "Error in fetching sensors: " + error.message;
+    this.setState({sensorModelsResult: ResponseUtils.ResponseFailure(sensorModelsErrorString)});
+  }
+
+  // Updates positionResult.
+  updatePositionAsync() {
+    this.setState({positionResult: ResponseUtils.ResponsePending()});
+
+    return function (options) {
+        return new Promise(function(resolve, reject) {
+          navigator.geolocation.getCurrentPosition(resolve, reject, options);
+        });
+    }()
+      .then(position =>
+        constructPositionData(
+          parseFloat(position.coords.latitude),
+          parseFloat(position.coords.longitude)))
+      .then(position => {
+        this.setState({
+          positionResult: ResponseUtils.ResponseSuccess(position)
+        });
+        // Return the original position, so that subsequent logic can work with it.
+        return position;
+      })
+    .catch(error => this.handlePositionError(error));
+  }
+
+  // Updates sensorModelsResult.
+  updateSensorModelsAsync() {
+    this.setState({sensorModelsResult: ResponseUtils.ResponsePending()});
+
+    return getSensorResults()
+      .then(sensorModels => {
+        this.setState({
+          sensorModelsResult: ResponseUtils.ResponseSuccess(sensorModels)
+        });
+        return sensorModels;
+      })
+      .catch(error => this.handleResultError(error));
   }
 
   // Fetches position and sensor readings, and updates the status.
-  updateStatus(refreshPosition) {
+  updateStatusAsync(refreshPosition) {
     console.log("[" + new Date() + "] updating...");
 
-    this.setState({sensorModelsResult: ResponseUtils.ResponsePending()});
-
     var positionPromise;
-
     var hasPreviousPosition =
       (this.state.positionResult != null &&
         this.state.positionResult[ResponseUtils.ResponseProperties.TAG] ===
         ResponseUtils.ResponseStates.SUCCESS);
-
     if (!refreshPosition && hasPreviousPosition) {
       positionPromise = Promise.resolve(
         this.state.positionResult[ResponseUtils.ResponseProperties.VALUE]);
     } else {
-      this.setState({positionResult: ResponseUtils.ResponsePending()});
-      // Issue requests for position and sensor readings.
-      positionPromise = function (options) {
-          return new Promise(function(resolve, reject) {
-            navigator.geolocation.getCurrentPosition(resolve, reject, options);
-          });
-      }()
-        .then(position =>
-          constructPositionData(
-            parseFloat(position.coords.latitude),
-            parseFloat(position.coords.longitude)))
-        .then(position => {
-          this.setState({
-            positionResult: ResponseUtils.ResponseSuccess(position)
-          });
-          // Return the original position, so that subsequent logic can work with it.
-          return position;
-        })
-      .catch(error => this.handlePositionError(error));
+      positionPromise = this.updatePositionAsync();
     }
 
-    var rawResultsPromise = getRawResults();
-    // Check for errors with the sensor reading per se, because Promise.all fails
-    // fast.
-    // Update eagerly if there's a failure.
-    // In the successful case, we can't update until we have both position and
-    // sensor readings.
-    rawResultsPromise = rawResultsPromise
-      .catch(error => this.handleResultError(error));
+    var sensorModelsPromise = this.updateSensorModelsAsync();
 
-    // Compute PM2.5 and update UI.
-    Promise.all([rawResultsPromise, positionPromise])
-      .then(promises =>
-        this.setState({
-          sensorModelsResult: ResponseUtils.ResponseSuccess(promises[0])
-        }))
-      // Either the position or the sensor promise failed (or some business
-      // logic broke).
-      // Since sensorModels depends on both being successful, update its state.
-      .catch(error =>
-        this.setState({
-          sensorModelsResult: ResponseUtils.ResponseFailure(error.message)
-        }));
+    Promise.all([positionPromise, sensorModelsPromise])
+      .then(results => {
+        console.log("[" + new Date() + "] finished updating.");
+        console.log(results);
+      });
   }
 }
 
