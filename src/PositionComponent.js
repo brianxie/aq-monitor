@@ -2,7 +2,7 @@ import React from 'react';
 import * as ResponseUtils from './ResponseUtils';
 import * as Sensor from './Sensor';
 
-// props::position
+// props::positionResult
 class PositionComponent extends React.Component {
   render() {
     return (
@@ -16,18 +16,18 @@ class PositionComponent extends React.Component {
   }
 
   getPositionString() {
-    var position = this.props.position;
-    if (position == null) {
+    var positionResult = this.props.positionResult;
+    if (positionResult == null) {
       return "Position unknown";
     }
-    var tag = position[ResponseUtils.ResponseProperties.TAG];
+    var tag = positionResult[ResponseUtils.ResponseProperties.TAG];
     switch (tag) {
       case ResponseUtils.ResponseStates.SUCCESS:
         return "Postion: " +
           this.parsePositionValue(
-            position[ResponseUtils.ResponseProperties.VALUE]);
+            positionResult[ResponseUtils.ResponseProperties.VALUE]);
       case ResponseUtils.ResponseStates.FAILURE:
-        return "Error: " + position[ResponseUtils.ResponseProperties.ERR];
+        return "Error: " + positionResult[ResponseUtils.ResponseProperties.ERR];
       case ResponseUtils.ResponseStates.PENDING:
         return "Fetching position...";
       default:

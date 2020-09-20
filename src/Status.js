@@ -32,25 +32,6 @@ function createSensorModel(jsonResult) {
   }
 }
 
-// Computes distance between a single result and the provided position using
-// the Euclidean metric.
-function distanceFromCurrentPosition(sensor, position) {
-  var deltaLatitude =
-    sensor.positionData[Sensor.PositionKeys.LATITUDE]
-    - position[Sensor.PositionKeys.LATITUDE];
-  var deltaLongitude =
-    sensor.positionData[Sensor.PositionKeys.LONGITUDE]
-    - position[Sensor.PositionKeys.LONGITUDE];
-  return Math.sqrt(Math.pow(deltaLatitude, 2) + Math.pow(deltaLongitude, 2));
-}
-
-// TODO: move this to sensor class
-// Sorts results by distance from position, increasing.
-function getSortedResults(sensors, position) {
-  return sensors.sort((a, b) =>
-    distanceFromCurrentPosition(a, position) - distanceFromCurrentPosition(b, position));
-}
-
 // Wrap a latitude and longitude in a PositionData object.
 function constructPositionData(latitude, longitude) {
   return {
@@ -90,8 +71,8 @@ class Status extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      sensorModels: null,
-      position: null,
+      sensorModelsResult: null,
+      positionResult: null,
       timer: null,
     };
   }
@@ -115,15 +96,15 @@ class Status extends React.Component {
           class="card-body"
         >
           {<SensorsComponent
-            sensorModels={this.state.sensorModels}
-            position={this.state.position} />}
+            sensorModelsResult={this.state.sensorModelsResult}
+            positionResult={this.state.positionResult} />}
         </div>
 
         <div
           className="Position"
           class="card-body"
         >
-          {<PositionComponent position={this.state.position} />}
+          {<PositionComponent positionResult={this.state.positionResult} />}
         </div>
 
         <div
@@ -150,7 +131,7 @@ class Status extends React.Component {
   // Handles errors in sensor fetching.
   handleResultError(error) {
     const resultErrorString = "Error in fetching sensors: " + error.message;
-    this.setState({sensorModels: ResponseUtils.ResponseFailure(resultErrorString)});
+    this.setState({sensorModelsResult: ResponseUtils.ResponseFailure(resultErrorString)});
     // Rethrow the error for subsequent nodes.
     throw new Error(resultErrorString);
   }
@@ -158,7 +139,7 @@ class Status extends React.Component {
   // Handles errors in position fetching.
   handlePositionError(error) {
     const positionErrorString = "Error in fetching position: " + error.message;
-    this.setState({position: ResponseUtils.ResponseFailure(positionErrorString)});
+    this.setState({positionResult: ResponseUtils.ResponseFailure(positionErrorString)});
     // Rethrow the error for subsequent nodes.
     throw new Error(positionErrorString);
   }
@@ -167,20 +148,20 @@ class Status extends React.Component {
   updateStatus(refreshPosition) {
     console.log("[" + new Date() + "] updating...");
 
-    this.setState({sensorModels: ResponseUtils.ResponsePending()});
+    this.setState({sensorModelsResult: ResponseUtils.ResponsePending()});
 
     var positionPromise;
 
     var hasPreviousPosition =
-      (this.state.position != null &&
-        this.state.position[ResponseUtils.ResponseProperties.TAG] ===
+      (this.state.positionResult != null &&
+        this.state.positionResult[ResponseUtils.ResponseProperties.TAG] ===
         ResponseUtils.ResponseStates.SUCCESS);
 
     if (!refreshPosition && hasPreviousPosition) {
       positionPromise = Promise.resolve(
-        this.state.position[ResponseUtils.ResponseProperties.VALUE]);
+        this.state.positionResult[ResponseUtils.ResponseProperties.VALUE]);
     } else {
-      this.setState({position: ResponseUtils.ResponsePending()});
+      this.setState({positionResult: ResponseUtils.ResponsePending()});
       // Issue requests for position and sensor readings.
       positionPromise = function (options) {
           return new Promise(function(resolve, reject) {
@@ -193,7 +174,7 @@ class Status extends React.Component {
             parseFloat(position.coords.longitude)))
         .then(position => {
           this.setState({
-            position: ResponseUtils.ResponseSuccess(position)
+            positionResult: ResponseUtils.ResponseSuccess(position)
           });
           // Return the original position, so that subsequent logic can work with it.
           return position;
@@ -212,17 +193,16 @@ class Status extends React.Component {
 
     // Compute PM2.5 and update UI.
     Promise.all([rawResultsPromise, positionPromise])
-      .then(promises => getSortedResults(promises[0], promises[1]))
-      .then(sensorModels =>
+      .then(promises =>
         this.setState({
-          sensorModels: ResponseUtils.ResponseSuccess(sensorModels)
+          sensorModelsResult: ResponseUtils.ResponseSuccess(promises[0])
         }))
       // Either the position or the sensor promise failed (or some business
       // logic broke).
       // Since sensorModels depends on both being successful, update its state.
       .catch(error =>
         this.setState({
-          sensorModels: ResponseUtils.ResponseFailure(error.message)
+          sensorModelsResult: ResponseUtils.ResponseFailure(error.message)
         }));
   }
 }

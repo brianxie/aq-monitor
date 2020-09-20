@@ -52,39 +52,77 @@ function computeAQIPM25(C) {
   return ((C - C_low) * (I_high - I_low) / (C_high - C_low)) + I_low;
 }
 
-const MAX_SENSORS = 8;
+// Computes distance between a single result and the provided position using
+// the Euclidean metric.
+function distanceFromCurrentPosition(sensorModel, position) {
+  var deltaLatitude =
+    sensorModel.positionData[Sensor.PositionKeys.LATITUDE]
+    - position[Sensor.PositionKeys.LATITUDE];
+  var deltaLongitude =
+    sensorModel.positionData[Sensor.PositionKeys.LONGITUDE]
+    - position[Sensor.PositionKeys.LONGITUDE];
+  return Math.sqrt(Math.pow(deltaLatitude, 2) + Math.pow(deltaLongitude, 2));
+}
 
-// props::sensorModels
-// props::position
+const MAX_SENSORS = 6;
+
+// props::sensorModelsResult
+// props::positionResult
 // aqi, raw pm, drilldowns. maybe maps?
 class SensorsComponent extends React.Component {
   render() {
     return (
       <div class="card-body">
-        {this.getClosestSensorsText()}
+        {this.getClosestSensorsText(MAX_SENSORS)}
       </div>
     );
   }
 
-  getClosestSensorsText() {
-    var sensorModels = this.props.sensorModels;
-    if (sensorModels == null) {
+  // Not very generic
+  getClosestSensorsText(limit) {
+    var positionResult = this.props.positionResult;
+    var sensorModelsResult = this.props.sensorModelsResult;
+    if (positionResult == null || sensorModelsResult == null) {
       return "No sensor data";
     }
-    var tag = sensorModels[ResponseUtils.ResponseProperties.TAG];
-    switch (tag) {
-      // TODO: this is gnarly
-      case ResponseUtils.ResponseStates.SUCCESS:
-        return sensorModels[ResponseUtils.ResponseProperties.VALUE]
-          .slice(0, MAX_SENSORS)
-          .map(model => this.getSingleSensorElem(model));
-      case ResponseUtils.ResponseStates.FAILURE:
-        return "Error: " + sensorModels[ResponseUtils.ResponseProperties.ERR];
-      case ResponseUtils.ResponseStates.PENDING:
-        return "Fetching sensor data...";
-      default:
-        throw new Error("Unrecognized tag: " + tag.toString());
+
+    var positionTag = positionResult[ResponseUtils.ResponseProperties.TAG];
+    var sensorModelsTag = sensorModelsResult[ResponseUtils.ResponseProperties.TAG];
+
+    if (positionTag === ResponseUtils.ResponseStates.ERR
+      && sensorModelsTag === ResponseUtils.ResponseStates.ERR) {
+      // Double failure.
+      return "Error: "
+        + positionResult[ResponseUtils.ResponseProperties.ERR]
+        + " | "
+        + sensorModelsResult[ResponseUtils.ResponseProperties.ERR];
+    } else if (positionTag === ResponseUtils.ResponseStates.ERR
+      || sensorModelsTag === ResponseUtils.ResponseStates.ERR) {
+      // Single failure.
+      var oneOfErrorString = (positionTag === ResponseUtils.ResponseStates.ERR)
+        ? positionResult[ResponseUtils.ResponseProperties.ERR]
+        : sensorModelsResult[ResponseUtils.ResponseProperties.ERR];
+      return "Error: " + oneOfErrorString;
+    } else if (positionTag === ResponseUtils.ResponseStates.PENDING
+      || sensorModelsTag === ResponseUtils.ResponseStates.PENDING) {
+      // Pending.
+      return "Fetching sensor data...";
+    } else if (positionTag === ResponseUtils.ResponseStates.SUCCESS
+      && sensorModelsTag === ResponseUtils.ResponseStates.SUCCESS) {
+      // All successful.
+      var position = positionResult[ResponseUtils.ResponseProperties.VALUE];
+      var sensorModels = sensorModelsResult[ResponseUtils.ResponseProperties.VALUE];
+      return sensorModels
+        .sort((a, b) =>
+          distanceFromCurrentPosition(a, position)
+          - distanceFromCurrentPosition(b, position))
+        .slice(0, limit)
+        .map(model => this.getSingleSensorElem(model));
     }
+
+    throw new Error(
+      "ResponseState could not be handled: "
+        + positionTag.toString() + " | " + sensorModelsTag.toString());
   }
 
   // Can obtain more from SensorModel::toString
