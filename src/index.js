@@ -44,7 +44,7 @@ class Monitor extends React.Component {
   }
 
   renderStatus() {
-    const pollIntervalMillis =  300000; // 5 minutes
+    const pollIntervalMillis = 120000; // 2 minutes
     return(
       <div class="container p-3">
         <Status

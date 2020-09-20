@@ -1,5 +1,6 @@
 import React from 'react';
 import * as TimeUtils from './TimeUtils';
+import Button from './Button';
 
 // props::callback
 // props::pollIntervalMillis
@@ -17,16 +18,16 @@ class TimerComponent extends React.Component {
     // Start a timer.
     this.setState({timer: new TimeUtils.Timer(
       TimeUtils.TimerState.RUNNING,
-      this.props.pollIntervalMillis)}
+      /*remainingTimeMillis=*/ this.props.pollIntervalMillis,
+      /*defaultTimeMillis=*/ this.props.pollIntervalMillis,
+      () => this.props.callback())}
     );
 
     // Every second, decrement by a second and handle side-effects.
     this.timerId = setInterval(
-      () => this.updateTimer(
-        tickIntervalMillis,
-        this.props.pollIntervalMillis),
-      tickIntervalMillis
-    );
+      () =>
+        this.setState({timer: this.state.timer.decrement(tickIntervalMillis)}),
+      tickIntervalMillis);
   }
 
   componentWillUnmount() {
@@ -40,27 +41,22 @@ class TimerComponent extends React.Component {
         class="card-body"
       >
         {this.renderTimer()}
+        {this.renderButton()}
       </div>
     );
   }
 
-  // TODO: pause, etc
-  updateTimer(deltaMillis, defaultDuration) {
-    var newDuration = this.state.timer.remainingTimeMillis - deltaMillis;
-    var timerState = newDuration <= 0
-      ? TimeUtils.TimerState.EXPIRED
-      : this.state.timer.timerState;
-    this.setState({timer: new TimeUtils.Timer(timerState, newDuration)});
-    // If the timer is already expired, execute the callback and reset the
-    // timer.
-    if (timerState === TimeUtils.TimerState.EXPIRED) {
-      this.props.callback();
-      this.setState({
-        timer: new TimeUtils.Timer(
-          TimeUtils.TimerState.RUNNING, defaultDuration)
-      });
+  togglePauseResumeTimer() {
+    if (this.state.timer.timerState === TimeUtils.TimerState.RUNNING) {
+      this.setState({timer: this.state.timer.pause()});
+    } else if (this.state.timer.timerState === TimeUtils.TimerState.PAUSED) {
+      this.setState({timer: this.state.timer.resume()});
     }
   }
+
+  resetTimer() {
+  }
+
 
   renderTimer() {
     var timer = this.state.timer;
@@ -68,6 +64,16 @@ class TimerComponent extends React.Component {
       return "No timer present";
     }
     return timer.toString();
+  }
+
+  renderButton() {
+    return(
+      <div class="container p-3">
+        <Button
+          text={"pause/resume timer"}
+          handleClick={() => this.togglePauseResumeTimer()}/>
+      </div>
+    );
   }
 }
 
