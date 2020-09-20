@@ -36,7 +36,6 @@ class PositionComponent extends React.Component {
     switch (tag) {
       case ResponseUtils.ResponseStates.SUCCESS:
         return MarkupUtils.wrapInContainer(
-          "Postion: " +
           this.parsePositionValue(
             positionResult[ResponseUtils.ResponseProperties.VALUE]));
       case ResponseUtils.ResponseStates.FAILURE:
@@ -49,6 +48,7 @@ class PositionComponent extends React.Component {
     }
   }
 
+  // TODO: fix string
   parsePositionValue(positionValue) {
     return "Latitude: "
       + positionValue[Sensor.PositionKeys.LATITUDE].toString()

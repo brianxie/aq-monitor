@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from  './Button';
 import * as Sensor from './Sensor';
 import * as MarkupUtils from './MarkupUtils';
 import * as ResponseUtils from './ResponseUtils';
@@ -93,11 +94,23 @@ function wrapSensorModelWithDistance(sensorModel, position) {
 
 // props::sensorModelsResult
 // props::positionResult
+// props::updateFn
 class SensorsComponent extends React.Component {
   render() {
     return (
       <div className="card border-secondary">
         {this.getClosestSensorsElements(MAX_SENSORS)}
+        {this.renderButton()}
+      </div>
+    );
+  }
+
+  renderButton() {
+    return(
+      <div className="container">
+        <Button
+          text={"Refresh sensor data"}
+          handleClick={() => this.props.updateFn()} />
       </div>
     );
   }

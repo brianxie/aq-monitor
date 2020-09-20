@@ -1,8 +1,8 @@
 export const TimerState = {
   RUNNING: "running",
   PAUSED: "paused",
-  EXPIRED: "expired",
-  INACTIVE: "inactive",
+  EXPIRED: "expired", // unused
+  INACTIVE: "inactive", // unused
 }
 
 export class Timer {
@@ -20,19 +20,14 @@ export class Timer {
     }
 
     var newRemainingTimeMillis = this.remainingTimeMillis - deltaMillis;
-    var newTimerState = (newRemainingTimeMillis <= 0)
-      ? TimerState.EXPIRED
-      : this.timerState;
-
-    this.remainingTimeMillis = newRemainingTimeMillis;
-    this.timerState = newTimerState;
 
     // If the timer is already expired, execute the callback and reset the
     // timer.
-    if (newTimerState === TimerState.EXPIRED) {
+    if (newRemainingTimeMillis <= 0) {
       this.callback();
       this.remainingTimeMillis = this.defaultTimeMillis;
-      this.timerState = TimerState.RUNNING;
+    } else {
+      this.remainingTimeMillis = newRemainingTimeMillis;
     }
 
     return this;
@@ -48,6 +43,11 @@ export class Timer {
     return this;
   }
 
+  reset () {
+    this.remainingTimeMillis = this.defaultTimeMillis;
+    return this;
+  }
+
   togglePauseResumeAndReturn() {
     var timerState = this.timerState;
     if (timerState === TimerState.PAUSED) {
@@ -60,6 +60,7 @@ export class Timer {
     return this;
   }
 
+  // TODO: fix string
   toString() {
     return "Timer state: " + this.timerState + "\n"
       + "Time remaining (seconds): "

@@ -94,7 +94,8 @@ class Status extends React.Component {
 
           {<SensorsComponent
             sensorModelsResult={this.state.sensorModelsResult}
-            positionResult={this.state.positionResult} />}
+            positionResult={this.state.positionResult}
+            updateFn={() => this.updateStatusAsync(false)} />}
 
           {<PositionComponent
             positionResult={this.state.positionResult}

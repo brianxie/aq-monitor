@@ -39,7 +39,7 @@ class TimerComponent extends React.Component {
     return (
       <div className="card border-secondary">
         {this.renderTimer()}
-        {this.renderButton()}
+        {this.renderButtonGroup()}
       </div>
     );
   }
@@ -53,6 +53,7 @@ class TimerComponent extends React.Component {
   }
 
   resetTimer() {
+    this.setState({timer: this.state.timer.reset()});
   }
 
   renderTimer() {
@@ -63,13 +64,44 @@ class TimerComponent extends React.Component {
     return MarkupUtils.wrapInContainer(timer.toString());
   }
 
-  renderButton() {
-    return(
-      <div className="container">
-        <Button
-          text={"pause/resume timer"}
-          handleClick={() => this.togglePauseResumeTimer()}/>
+  renderButtonGroup() {
+    return (
+      <div className="buttonGroup" role="group">
+        {this.renderToggleButton()}
+        {this.renderResetButton()}
       </div>
+    );
+  }
+
+  renderToggleButton() {
+    var buttonText;
+    if (this.state.timer == null) {
+      buttonText = "Pause/Resume";
+    } else {
+      switch (this.state.timer.timerState) {
+        case TimeUtils.TimerState.RUNNING:
+          buttonText = "Pause";
+          break;
+        case TimeUtils.TimerState.PAUSED:
+          buttonText = "Resume";
+          break;
+        default:
+          throw new Error("Cannot toggle timer in state: " + this.state.timer.timerState);
+      }
+    }
+
+    return(
+      <Button
+        text={buttonText}
+        handleClick={() => this.togglePauseResumeTimer()}/>
+    );
+  }
+
+  renderResetButton() {
+    return(
+      <Button
+        text={"Reset"}
+        handleClick={() => this.resetTimer()}/>
     );
   }
 }
