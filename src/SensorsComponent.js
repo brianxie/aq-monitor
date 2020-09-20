@@ -52,6 +52,8 @@ function computeAQIPM25(C) {
   return ((C - C_low) * (I_high - I_low) / (C_high - C_low)) + I_low;
 }
 
+const MAX_SENSORS = 8;
+
 // props::sensorModels
 // props::position
 // aqi, raw pm, drilldowns. maybe maps?
@@ -59,12 +61,12 @@ class SensorsComponent extends React.Component {
   render() {
     return (
       <div class="card-body">
-        {this.getSensorsText()}
+        {this.getClosestSensorsText()}
       </div>
     );
   }
 
-  getSensorsText() {
+  getClosestSensorsText() {
     var sensorModels = this.props.sensorModels;
     if (sensorModels == null) {
       return "No sensor data";
@@ -73,9 +75,9 @@ class SensorsComponent extends React.Component {
     switch (tag) {
       // TODO: this is gnarly
       case ResponseUtils.ResponseStates.SUCCESS:
-        var parsedSensors = sensorModels[ResponseUtils.ResponseProperties.VALUE]
+        return sensorModels[ResponseUtils.ResponseProperties.VALUE]
+          .slice(0, MAX_SENSORS)
           .map(model => this.getSingleSensorElem(model));
-        return parsedSensors;
       case ResponseUtils.ResponseStates.FAILURE:
         return "Error: " + sensorModels[ResponseUtils.ResponseProperties.ERR];
       case ResponseUtils.ResponseStates.PENDING:

@@ -44,6 +44,7 @@ function distanceFromCurrentPosition(sensor, position) {
   return Math.sqrt(Math.pow(deltaLatitude, 2) + Math.pow(deltaLongitude, 2));
 }
 
+// TODO: move this to sensor class
 // Sorts results by distance from position, increasing.
 function getSortedResults(sensors, position) {
   return sensors.sort((a, b) =>
@@ -80,9 +81,6 @@ function getRawResults() {
     .then(results => results.filter(result => ResponseUtils.isSuccessful(result)))
     .then(results => results.map(result => result[ResponseUtils.ResponseProperties.VALUE]));
 }
-
-// Maximum number of sensors from which to consider data.
-const MAX_SENSORS = 5;
 
 //
 // React component
@@ -215,8 +213,6 @@ class Status extends React.Component {
     // Compute PM2.5 and update UI.
     Promise.all([rawResultsPromise, positionPromise])
       .then(promises => getSortedResults(promises[0], promises[1]))
-      .then(sortedResults => sortedResults.slice(0, MAX_SENSORS))
-      //.then(sortedResults => constructSensorModels(sortedResults))
       .then(sensorModels =>
         this.setState({
           sensorModels: ResponseUtils.ResponseSuccess(sensorModels)
