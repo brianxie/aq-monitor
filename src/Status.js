@@ -79,40 +79,28 @@ class Status extends React.Component {
 
   render() {
     return (
-      <div
-        className="card text-left border-secondary"
-      >
-
-        <div
-          className="card-body"
-        >
+      <div className="container">
+        <div className="container">
           {"TODO: catchall text"}
         </div>
 
-        <div
-          className="card-body"
-        >
+        <div className="card border-secondary">
           {<SensorsComponent
             sensorModelsResult={this.state.sensorModelsResult}
             positionResult={this.state.positionResult} />}
         </div>
 
-        <div
-          className="card-body"
-        >
+        <div className="card border-secondary">
           {<PositionComponent
             positionResult={this.state.positionResult}
             updateFn={() => this.updatePositionAsync()} />}
         </div>
 
-        <div
-          className="card-body"
-        >
+        <div className="card border-secondary">
           {<TimerComponent
             pollIntervalMillis={this.props.pollIntervalMillis}
             callback={() => this.updateStatusAsync(false)} />}
         </div>
-
       </div>
     );
   }

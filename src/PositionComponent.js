@@ -1,17 +1,16 @@
 import React from 'react';
-import * as ResponseUtils from './ResponseUtils';
-import * as Sensor from './Sensor';
 import Button from './Button';
+import * as Sensor from './Sensor';
+import * as ResponseUtils from './ResponseUtils';
+import * as MarkupUtils from './MarkupUtils';
 
 // props::positionResult
 // props::updateFn
 class PositionComponent extends React.Component {
   render() {
     return (
-      <div
-        className="card-body"
-      >
-        {this.getPositionString()}
+      <div className="container">
+        {this.renderCurrentPositionElement()}
         {this.renderButton()}
       </div>
     );
@@ -19,40 +18,42 @@ class PositionComponent extends React.Component {
 
   renderButton() {
     return(
-      <div className="container p-3">
+      <div className="container">
         <Button
           text={"Refresh location"}
-          handleClick={() => this.props.updateFn()}
-        />
+          handleClick={() => this.props.updateFn()} />
       </div>
     );
   }
 
-  getPositionString() {
+  renderCurrentPositionElement() {
     var positionResult = this.props.positionResult;
     if (positionResult == null) {
-      return "Position unknown";
+      return MarkupUtils.wrapInContainer("Position unknown");
     }
 
     var tag = positionResult[ResponseUtils.ResponseProperties.TAG];
     switch (tag) {
       case ResponseUtils.ResponseStates.SUCCESS:
-        return "Postion: " +
+        return MarkupUtils.wrapInContainer(
+          "Postion: " +
           this.parsePositionValue(
-            positionResult[ResponseUtils.ResponseProperties.VALUE]);
+            positionResult[ResponseUtils.ResponseProperties.VALUE]));
       case ResponseUtils.ResponseStates.FAILURE:
-        return "Error: " + positionResult[ResponseUtils.ResponseProperties.ERR];
+        return MarkupUtils.wrapInContainer(
+          "Error: " + positionResult[ResponseUtils.ResponseProperties.ERR]);
       case ResponseUtils.ResponseStates.PENDING:
-        return "Fetching position...";
+        return MarkupUtils.wrapInContainer("Fetching position...");
       default:
         throw new Error("Unrecognized tag: " + tag.toString());
     }
   }
 
   parsePositionValue(positionValue) {
-    return "Latitude: " + positionValue[Sensor.PositionKeys.LATITUDE].toString()
-      + " "
-      + "Longitude: " + positionValue[Sensor.PositionKeys.LONGITUDE].toString();
+    return "Latitude: "
+      + positionValue[Sensor.PositionKeys.LATITUDE].toString()
+      + " Longitude: "
+      + positionValue[Sensor.PositionKeys.LONGITUDE].toString();
   }
 }
 

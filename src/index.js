@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {CSSTransition} from 'react-transition-group';
-import './index.css';
 import Button from './Button';
 import Status from './Status';
+import './index.css';
 
 class Monitor extends React.Component {
   constructor(props) {
@@ -15,10 +15,10 @@ class Monitor extends React.Component {
 
   renderButton() {
     return(
-      <div className="container p-3">
+      <div className="container">
         <Button
           text={"What's my AQI?"}
-          handleClick={() => this.toggleStatus()}/>
+          handleClick={() => this.toggleStatus()} />
       </div>
     );
   }
@@ -36,7 +36,7 @@ class Monitor extends React.Component {
         timeout={300}
         classNames="StatusTransition"
       >
-        <div>
+        <div className="container">
           {statusActive && appearFn}
         </div>
       </CSSTransition>
@@ -46,18 +46,13 @@ class Monitor extends React.Component {
   renderStatus() {
     const pollIntervalMillis = 120000; // 2 minutes
     return(
-      <div className="container p-3">
-        <Status
-          pollIntervalMillis={pollIntervalMillis} />
-      </div>
+      <Status pollIntervalMillis={pollIntervalMillis} />
     );
   }
 
   render() {
     return(
-      <div
-        className="container m-5"
-      >
+      <div className="container">
         {this.renderButton()}
         {this.renderStatusPlaceholder(
           this.state.statusActive,
@@ -67,6 +62,7 @@ class Monitor extends React.Component {
   }
 }
 
+// TODO: Maybe render an alert.
 ReactDOM.render(
   <Monitor />,
   document.getElementById('root')

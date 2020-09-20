@@ -1,6 +1,7 @@
 import React from 'react';
-import * as ResponseUtils from './ResponseUtils';
 import * as Sensor from './Sensor';
+import * as MarkupUtils from './MarkupUtils';
+import * as ResponseUtils from './ResponseUtils';
 
 const MAX_SENSORS = 6;
 const RADIANS_PER_DEGREE = Math.PI / 180;
@@ -95,18 +96,17 @@ function wrapSensorModelWithDistance(sensorModel, position) {
 class SensorsComponent extends React.Component {
   render() {
     return (
-      <div className="card-body">
-        {this.getClosestSensorsText(MAX_SENSORS)}
+      <div className="container">
+        {this.getClosestSensorsElements(MAX_SENSORS)}
       </div>
     );
   }
 
-  // TODO: unify returned representation (either a string or div).
-  getClosestSensorsText(limit) {
+  getClosestSensorsElements(limit) {
     var positionResult = this.props.positionResult;
     var sensorModelsResult = this.props.sensorModelsResult;
     if (positionResult == null || sensorModelsResult == null) {
-      return "No sensor data";
+      return MarkupUtils.wrapInContainer("No sensor data");
     }
 
     var positionTag = positionResult[ResponseUtils.ResponseProperties.TAG];
@@ -115,21 +115,22 @@ class SensorsComponent extends React.Component {
     if (positionTag === ResponseUtils.ResponseStates.FAILURE
       && sensorModelsTag === ResponseUtils.ResponseStates.FAILURE) {
       // Double failure.
-      return "Error: "
+      return MarkupUtils.wrapInContainer(
+        "Error: "
         + positionResult[ResponseUtils.ResponseProperties.ERR]
         + " | "
-        + sensorModelsResult[ResponseUtils.ResponseProperties.ERR];
+        + sensorModelsResult[ResponseUtils.ResponseProperties.ERR]);
     } else if (positionTag === ResponseUtils.ResponseStates.FAILURE
       || sensorModelsTag === ResponseUtils.ResponseStates.FAILURE) {
       // Single failure.
       var oneOfErrorString = (positionTag === ResponseUtils.ResponseStates.FAILURE)
         ? positionResult[ResponseUtils.ResponseProperties.ERR]
         : sensorModelsResult[ResponseUtils.ResponseProperties.ERR];
-      return "Error: " + oneOfErrorString;
+      return MarkupUtils.wrapInContainer("Error: " + oneOfErrorString);
     } else if (positionTag === ResponseUtils.ResponseStates.PENDING
       || sensorModelsTag === ResponseUtils.ResponseStates.PENDING) {
       // Pending.
-      return "Fetching sensor data...";
+      return MarkupUtils.wrapInContainer("Fetching sensor data...");
     } else if (positionTag === ResponseUtils.ResponseStates.SUCCESS
       && sensorModelsTag === ResponseUtils.ResponseStates.SUCCESS) {
       // All successful.
@@ -150,11 +151,11 @@ class SensorsComponent extends React.Component {
   // TODO: leverage SensorModel::toString
   computeAndFormatScore(sensorWithDistance) {
     return (
-      <div className="card-body">
-        <div>
+      <div className="container">
+        <div className="badge badge-secondary">
           {computeAQIPM25(sensorWithDistance["sensorModel"].timeData[Sensor.TimeDataKeys.REALTIME])}
         </div>
-        <div>
+        <div className="badge badge-secondary">
           {sensorWithDistance["distance"]}
         </div>
       </div>
