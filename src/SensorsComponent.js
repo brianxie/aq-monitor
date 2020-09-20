@@ -89,17 +89,17 @@ class SensorsComponent extends React.Component {
     var positionTag = positionResult[ResponseUtils.ResponseProperties.TAG];
     var sensorModelsTag = sensorModelsResult[ResponseUtils.ResponseProperties.TAG];
 
-    if (positionTag === ResponseUtils.ResponseStates.ERR
-      && sensorModelsTag === ResponseUtils.ResponseStates.ERR) {
+    if (positionTag === ResponseUtils.ResponseStates.FAILURE
+      && sensorModelsTag === ResponseUtils.ResponseStates.FAILURE) {
       // Double failure.
       return "Error: "
         + positionResult[ResponseUtils.ResponseProperties.ERR]
         + " | "
         + sensorModelsResult[ResponseUtils.ResponseProperties.ERR];
-    } else if (positionTag === ResponseUtils.ResponseStates.ERR
-      || sensorModelsTag === ResponseUtils.ResponseStates.ERR) {
+    } else if (positionTag === ResponseUtils.ResponseStates.FAILURE
+      || sensorModelsTag === ResponseUtils.ResponseStates.FAILURE) {
       // Single failure.
-      var oneOfErrorString = (positionTag === ResponseUtils.ResponseStates.ERR)
+      var oneOfErrorString = (positionTag === ResponseUtils.ResponseStates.FAILURE)
         ? positionResult[ResponseUtils.ResponseProperties.ERR]
         : sensorModelsResult[ResponseUtils.ResponseProperties.ERR];
       return "Error: " + oneOfErrorString;
