@@ -22,6 +22,7 @@ export class SensorModel {
     this.positionData = positionData;
   }
 
+  // TODO: Make toString() much more robust.
   toString() {
     var positionString =
         Object.keys(PositionKeys)

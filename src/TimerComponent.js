@@ -37,8 +37,7 @@ class TimerComponent extends React.Component {
   render() {
     return (
       <div
-        className="TimerComponent"
-        class="card-body"
+        className="card-body"
       >
         {this.renderTimer()}
         {this.renderButton()}
@@ -68,7 +67,7 @@ class TimerComponent extends React.Component {
 
   renderButton() {
     return(
-      <div class="container p-3">
+      <div className="container p-3">
         <Button
           text={"pause/resume timer"}
           handleClick={() => this.togglePauseResumeTimer()}/>

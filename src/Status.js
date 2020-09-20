@@ -80,20 +80,17 @@ class Status extends React.Component {
   render() {
     return (
       <div
-        className="Status"
-        class="card text-left border-secondary"
+        className="card text-left border-secondary"
       >
 
         <div
-          className="Catchall"
-          class="card-body"
+          className="card-body"
         >
           {"TODO: catchall text"}
         </div>
 
         <div
-          className="Sensors"
-          class="card-body"
+          className="card-body"
         >
           {<SensorsComponent
             sensorModelsResult={this.state.sensorModelsResult}
@@ -101,8 +98,7 @@ class Status extends React.Component {
         </div>
 
         <div
-          className="Position"
-          class="card-body"
+          className="card-body"
         >
           {<PositionComponent
             positionResult={this.state.positionResult}
@@ -110,8 +106,7 @@ class Status extends React.Component {
         </div>
 
         <div
-          className="TimerSection"
-          class="card-body"
+          className="card-body"
         >
           {<TimerComponent
             pollIntervalMillis={this.props.pollIntervalMillis}

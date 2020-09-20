@@ -15,9 +15,9 @@ class Monitor extends React.Component {
 
   renderButton() {
     return(
-      <div class="container p-3">
+      <div className="container p-3">
         <Button
-          text={"Placeholder expand/collapse"}
+          text={"What's my AQI?"}
           handleClick={() => this.toggleStatus()}/>
       </div>
     );
@@ -46,7 +46,7 @@ class Monitor extends React.Component {
   renderStatus() {
     const pollIntervalMillis = 120000; // 2 minutes
     return(
-      <div class="container p-3">
+      <div className="container p-3">
         <Status
           pollIntervalMillis={pollIntervalMillis} />
       </div>
@@ -56,8 +56,7 @@ class Monitor extends React.Component {
   render() {
     return(
       <div
-        className="Monitor"
-        class="container m-5"
+        className="container m-5"
       >
         {this.renderButton()}
         {this.renderStatusPlaceholder(

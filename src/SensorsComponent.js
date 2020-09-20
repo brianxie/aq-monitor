@@ -2,7 +2,10 @@ import React from 'react';
 import * as ResponseUtils from './ResponseUtils';
 import * as Sensor from './Sensor';
 
-// haha
+const MAX_SENSORS = 6;
+const RADIANS_PER_DEGREE = Math.PI / 180;
+const RADIUS = 6371; // km
+
 function computeAQIPM25(C) {
   var C_low;
   var C_high;
@@ -46,7 +49,7 @@ function computeAQIPM25(C) {
     I_high = 500;
   } else {
     throw new Error(
-      "AQI is _literally incapable_ of measuring such a large concentration");
+      "AQI is _literally incapable_ of measuring this concentration");
   }
 
   return ((C - C_low) * (I_high - I_low) / (C_high - C_low)) + I_low;
@@ -78,6 +81,8 @@ function distanceFromCurrentPosition(sensorModel, position) {
   return 2 * RADIUS * Math.asin(Math.sqrt(havCentralAngle));
 }
 
+// Returns an object containing the sensor and its distance from the provided
+// position in kilometers.
 function wrapSensorModelWithDistance(sensorModel, position) {
   return {
     sensorModel: sensorModel,
@@ -85,23 +90,18 @@ function wrapSensorModelWithDistance(sensorModel, position) {
   }
 }
 
-const MAX_SENSORS = 6;
-const RADIANS_PER_DEGREE = Math.PI / 180;
-const RADIUS = 6371; // km
-
 // props::sensorModelsResult
 // props::positionResult
-// aqi, raw pm, drilldowns. maybe maps?
 class SensorsComponent extends React.Component {
   render() {
     return (
-      <div class="card-body">
+      <div className="card-body">
         {this.getClosestSensorsText(MAX_SENSORS)}
       </div>
     );
   }
 
-  // Not very generic
+  // TODO: unify returned representation (either a string or div).
   getClosestSensorsText(limit) {
     var positionResult = this.props.positionResult;
     var sensorModelsResult = this.props.sensorModelsResult;
@@ -139,7 +139,7 @@ class SensorsComponent extends React.Component {
         .map(sensorModel => wrapSensorModelWithDistance(sensorModel, position))
         .sort((a, b) => a["distance"] - b["distance"])
         .slice(0, limit)
-        .map(sensorWithDistance => this.computeScore(sensorWithDistance));
+        .map(sensorWithDistance => this.computeAndFormatScore(sensorWithDistance));
     }
 
     throw new Error(
@@ -147,10 +147,10 @@ class SensorsComponent extends React.Component {
         + positionTag.toString() + " | " + sensorModelsTag.toString());
   }
 
-  // Can obtain more from SensorModel::toString
-  computeScore(sensorWithDistance) {
+  // TODO: leverage SensorModel::toString
+  computeAndFormatScore(sensorWithDistance) {
     return (
-      <div class="card-body">
+      <div className="card-body">
         <div>
           {computeAQIPM25(sensorWithDistance["sensorModel"].timeData[Sensor.TimeDataKeys.REALTIME])}
         </div>

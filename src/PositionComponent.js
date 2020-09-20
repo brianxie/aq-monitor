@@ -9,8 +9,7 @@ class PositionComponent extends React.Component {
   render() {
     return (
       <div
-        className="PositionComponent"
-        class="card-body"
+        className="card-body"
       >
         {this.getPositionString()}
         {this.renderButton()}
@@ -20,7 +19,7 @@ class PositionComponent extends React.Component {
 
   renderButton() {
     return(
-      <div class="container p-3">
+      <div className="container p-3">
         <Button
           text={"Refresh location"}
           handleClick={() => this.props.updateFn()}
