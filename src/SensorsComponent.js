@@ -52,19 +52,35 @@ function computeAQIPM25(C) {
   return ((C - C_low) * (I_high - I_low) / (C_high - C_low)) + I_low;
 }
 
+function haversine(deltaRadians) {
+  return Math.pow(Math.sin(deltaRadians / 2), 2);
+}
+
 // Computes distance between a single result and the provided position using
-// the Euclidean metric.
+// the Haversine formula.
 function distanceFromCurrentPosition(sensorModel, position) {
-  var deltaLatitude =
-    sensorModel.positionData[Sensor.PositionKeys.LATITUDE]
-    - position[Sensor.PositionKeys.LATITUDE];
-  var deltaLongitude =
-    sensorModel.positionData[Sensor.PositionKeys.LONGITUDE]
-    - position[Sensor.PositionKeys.LONGITUDE];
-  return Math.sqrt(Math.pow(deltaLatitude, 2) + Math.pow(deltaLongitude, 2));
+  var sensorLatRadians = RADIANS_PER_DEGREE
+    * sensorModel.positionData[Sensor.PositionKeys.LATITUDE];
+  var sensorLonRadians = RADIANS_PER_DEGREE
+    * sensorModel.positionData[Sensor.PositionKeys.LONGITUDE];
+  var posLatRadians = RADIANS_PER_DEGREE
+    * position[Sensor.PositionKeys.LATITUDE];
+  var posLonRadians = RADIANS_PER_DEGREE
+    * position[Sensor.PositionKeys.LONGITUDE];
+
+  var havLat = haversine(sensorLatRadians - posLatRadians);
+  var havLon = haversine(sensorLonRadians - posLonRadians);
+
+  var havCentralAngle =
+    havLat
+      + Math.cos(posLatRadians) * Math.cos(sensorLatRadians) * havLon;
+
+  return 2 * RADIUS * Math.asin(Math.sqrt(havCentralAngle));
 }
 
 const MAX_SENSORS = 6;
+const RADIANS_PER_DEGREE = Math.PI / 180;
+const RADIUS = 6371; // km
 
 // props::sensorModelsResult
 // props::positionResult
