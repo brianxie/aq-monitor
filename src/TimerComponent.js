@@ -37,7 +37,7 @@ class TimerComponent extends React.Component {
 
   render() {
     return (
-      <div className="container">
+      <div className="card border-secondary">
         {this.renderTimer()}
         {this.renderButton()}
       </div>

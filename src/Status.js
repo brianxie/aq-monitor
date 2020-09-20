@@ -81,26 +81,28 @@ class Status extends React.Component {
     return (
       <div className="container">
         <div className="container">
-          {"TODO: catchall text"}
+          {
+            "TODO:\n \
+              - Fix toString() methods\n \
+              - Add sensor refresh button\n \
+              - Add timer reset button \n \
+              - Make CSS transitions work, maybe?\n \
+              - Alert on threshold \
+            "
+          }
         </div>
 
-        <div className="card border-secondary">
           {<SensorsComponent
             sensorModelsResult={this.state.sensorModelsResult}
             positionResult={this.state.positionResult} />}
-        </div>
 
-        <div className="card border-secondary">
           {<PositionComponent
             positionResult={this.state.positionResult}
             updateFn={() => this.updatePositionAsync()} />}
-        </div>
 
-        <div className="card border-secondary">
           {<TimerComponent
             pollIntervalMillis={this.props.pollIntervalMillis}
             callback={() => this.updateStatusAsync(false)} />}
-        </div>
       </div>
     );
   }

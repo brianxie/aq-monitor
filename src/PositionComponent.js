@@ -9,7 +9,7 @@ import * as MarkupUtils from './MarkupUtils';
 class PositionComponent extends React.Component {
   render() {
     return (
-      <div className="container">
+      <div className="card border-secondary">
         {this.renderCurrentPositionElement()}
         {this.renderButton()}
       </div>

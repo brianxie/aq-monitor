@@ -96,7 +96,7 @@ function wrapSensorModelWithDistance(sensorModel, position) {
 class SensorsComponent extends React.Component {
   render() {
     return (
-      <div className="container">
+      <div className="card border-secondary">
         {this.getClosestSensorsElements(MAX_SENSORS)}
       </div>
     );
