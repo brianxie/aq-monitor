@@ -36,9 +36,9 @@ class PositionComponent extends React.Component {
   }
 
   parsePositionValue(positionValue) {
-    return "Latitude: " + positionValue[Sensor.LocationKeys.LATITUDE].toString()
+    return "Latitude: " + positionValue[Sensor.PositionKeys.LATITUDE].toString()
       + " "
-      + "Longitude: " + positionValue[Sensor.LocationKeys.LONGITUDE].toString();
+      + "Longitude: " + positionValue[Sensor.PositionKeys.LONGITUDE].toString();
   }
 }
 

@@ -53,6 +53,7 @@ function computeAQIPM25(C) {
 }
 
 // props::sensorModels
+// props::position
 // aqi, raw pm, drilldowns. maybe maps?
 class SensorsComponent extends React.Component {
   render() {

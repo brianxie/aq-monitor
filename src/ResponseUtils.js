@@ -10,6 +10,7 @@ export const ResponseProperties = {
   ERR: "err",
 }
 
+// TODO: Figure out how this wraps the response sum types.
 export const Response = (response) => ({
   [ResponseProperties.TAG]: response[ResponseProperties.TAG],
   [ResponseProperties.VALUE]: response[ResponseProperties.TAG] === ResponseStates.SUCCESS
@@ -20,7 +21,6 @@ export const Response = (response) => ({
     : null,
 });
 
-// TODO whoops, you forgot to wrap the actual Response
 export const ResponseSuccess = (value) => ({
   [ResponseProperties.TAG]: ResponseStates.SUCCESS,
   [ResponseProperties.VALUE]: value,
@@ -34,3 +34,7 @@ export const ResponseFailure = (err) => ({
 export const ResponsePending = () => ({
   [ResponseProperties.TAG]: ResponseStates.PENDING,
 });
+
+export function isSuccessful(responseType) {
+  return responseType[ResponseProperties.TAG] === ResponseStates.SUCCESS;
+}

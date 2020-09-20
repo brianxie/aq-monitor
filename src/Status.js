@@ -9,42 +9,9 @@ import * as ResponseUtils from './ResponseUtils';
 // Helper methods
 //
 
-// Transforms a result into an object containing the latitude, longitude, and
-// result itself.
-function createTaggedResult(jsonResult) {
-  return {
-    lat: parseFloat(jsonResult.Lat),
-    lon: parseFloat(jsonResult.Lon),
-    result: jsonResult
-  };
-}
-
-// Computes distance between a single result and the provided position using
-// the Euclidean metric.
-function distanceFromPosition(taggedResult, position) {
-  var dLat = taggedResult.lat - position[Sensor.LocationKeys.LATITUDE];
-  var dLon = taggedResult.lon - position[Sensor.LocationKeys.LONGITUDE];
-  return Math.sqrt(Math.pow(dLat, 2) + Math.pow(dLon, 2));
-}
-
-// Sorts results by distance from position, increasing.
-function getSortedResults(taggedResults, position) {
-  return taggedResults.sort((a, b) =>
-    distanceFromPosition(a, position) - distanceFromPosition(b, position))
-    .map(taggedResult => taggedResult.result);
-}
-
-function constructLocationData(latitude, longitude) {
-  return {
-      [Sensor.LocationKeys.LATITUDE]: latitude,
-      [Sensor.LocationKeys.LONGITUDE]: longitude,
-    };
-}
-
-// Transforms an array of results into an array of SensorModels.
-function constructSensorModels(results) {
-  return results.map(result => {
-    var stats = JSON.parse(result.Stats);
+function createSensorModel(jsonResult) {
+  try {
+    var stats = JSON.parse(jsonResult.Stats);
 
     var timeData = {
       [Sensor.TimeDataKeys.REALTIME]: stats.v,
@@ -54,11 +21,41 @@ function constructSensorModels(results) {
       [Sensor.TimeDataKeys.SIX_HOURS]: stats.v4,
       [Sensor.TimeDataKeys.ONE_DAY]: stats.v5,
     };
-    var locationData = constructLocationData(
-      parseFloat(result.Lat), parseFloat(result.Lon));
+    var positionData = constructPositionData(
+      jsonResult.Lat, jsonResult.Lon);
 
-    return new Sensor.SensorModel(timeData, locationData);
-  });
+    return ResponseUtils.ResponseSuccess(
+      new Sensor.SensorModel(timeData, positionData));
+  } catch (err) {
+    // JSON parsing may fail due to absent or malformatted fields.
+    return ResponseUtils.ResponseFailure(err);
+  }
+}
+
+// Computes distance between a single result and the provided position using
+// the Euclidean metric.
+function distanceFromCurrentPosition(sensor, position) {
+  var deltaLatitude =
+    sensor.positionData[Sensor.PositionKeys.LATITUDE]
+    - position[Sensor.PositionKeys.LATITUDE];
+  var deltaLongitude =
+    sensor.positionData[Sensor.PositionKeys.LONGITUDE]
+    - position[Sensor.PositionKeys.LONGITUDE];
+  return Math.sqrt(Math.pow(deltaLatitude, 2) + Math.pow(deltaLongitude, 2));
+}
+
+// Sorts results by distance from position, increasing.
+function getSortedResults(sensors, position) {
+  return sensors.sort((a, b) =>
+    distanceFromCurrentPosition(a, position) - distanceFromCurrentPosition(b, position));
+}
+
+// Wrap a latitude and longitude in a PositionData object.
+function constructPositionData(latitude, longitude) {
+  return {
+      [Sensor.PositionKeys.LATITUDE]: latitude,
+      [Sensor.PositionKeys.LONGITUDE]: longitude,
+    };
 }
 
 // Throws an error on a failed response, otherwise returns the response.
@@ -71,13 +68,17 @@ function checkResponseOk(response) {
 
 // Reads raw sensor results from PurpleAir.
 // Future function.
+// The fetched result is JSON-formatted and contains metadata followed by a
+// single "results" array.
 function getRawResults() {
   const srcUrl = "https://www.purpleair.com/json";
   return fetch(srcUrl)
     .then(response => checkResponseOk(response))
     .then(response => response.json())
     .then(jsonObj => jsonObj.results)
-    .then(results => results.map(result => createTaggedResult(result)));
+    .then(results => results.map(result => createSensorModel(result)))
+    .then(results => results.filter(result => ResponseUtils.isSuccessful(result)))
+    .then(results => results.map(result => result[ResponseUtils.ResponseProperties.VALUE]));
 }
 
 // Maximum number of sensors from which to consider data.
@@ -115,7 +116,9 @@ class Status extends React.Component {
           className="Sensors"
           class="card-body"
         >
-          {<SensorsComponent sensorModels={this.state.sensorModels}/>}
+          {<SensorsComponent
+            sensorModels={this.state.sensorModels}
+            position={this.state.position} />}
         </div>
 
         <div
@@ -138,7 +141,7 @@ class Status extends React.Component {
     );
   }
 
-  // Initial update on render update on render.
+  // Initial update on render.
   componentDidMount() {
     this.updateStatus(true);
   }
@@ -154,7 +157,7 @@ class Status extends React.Component {
     throw new Error(resultErrorString);
   }
 
-  // Handles errors in location fetching.
+  // Handles errors in position fetching.
   handlePositionError(error) {
     const positionErrorString = "Error in fetching position: " + error.message;
     this.setState({position: ResponseUtils.ResponseFailure(positionErrorString)});
@@ -162,8 +165,8 @@ class Status extends React.Component {
     throw new Error(positionErrorString);
   }
 
-  // Fetches location and sensor readings, and updates the status.
-  updateStatus(refreshLocation) {
+  // Fetches position and sensor readings, and updates the status.
+  updateStatus(refreshPosition) {
     console.log("[" + new Date() + "] updating...");
 
     this.setState({sensorModels: ResponseUtils.ResponsePending()});
@@ -175,7 +178,7 @@ class Status extends React.Component {
         this.state.position[ResponseUtils.ResponseProperties.TAG] ===
         ResponseUtils.ResponseStates.SUCCESS);
 
-    if (!refreshLocation && hasPreviousPosition) {
+    if (!refreshPosition && hasPreviousPosition) {
       positionPromise = Promise.resolve(
         this.state.position[ResponseUtils.ResponseProperties.VALUE]);
     } else {
@@ -187,7 +190,7 @@ class Status extends React.Component {
           });
       }()
         .then(position =>
-          constructLocationData(
+          constructPositionData(
             parseFloat(position.coords.latitude),
             parseFloat(position.coords.longitude)))
         .then(position => {
@@ -213,12 +216,12 @@ class Status extends React.Component {
     Promise.all([rawResultsPromise, positionPromise])
       .then(promises => getSortedResults(promises[0], promises[1]))
       .then(sortedResults => sortedResults.slice(0, MAX_SENSORS))
-      .then(sortedResults => constructSensorModels(sortedResults))
+      //.then(sortedResults => constructSensorModels(sortedResults))
       .then(sensorModels =>
         this.setState({
           sensorModels: ResponseUtils.ResponseSuccess(sensorModels)
         }))
-      // Either the location or the sensor promise failed (or some business
+      // Either the position or the sensor promise failed (or some business
       // logic broke).
       // Since sensorModels depends on both being successful, update its state.
       .catch(error =>

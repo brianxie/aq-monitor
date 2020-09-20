@@ -10,23 +10,23 @@ export const TimeDataKeys = {
   ONE_DAY: "one_day",
 }
 
-export const LocationKeys = {
+export const PositionKeys = {
   LATITUDE: "latitude",
   LONGITUDE: "longitude",
 }
 
 export class SensorModel {
-  constructor(timeData, locationData) {
+  constructor(timeData, positionData) {
     // These could be classes, but having enumerable properties is convenient.
     this.timeData = timeData;
-    this.locationData = locationData;
+    this.positionData = positionData;
   }
 
   toString() {
-    var locationString =
-        Object.keys(LocationKeys)
-          .map(keyEnum => LocationKeys[keyEnum])
-          .map(key => key.toString() + ": " + this.locationData[key].toString())
+    var positionString =
+        Object.keys(PositionKeys)
+          .map(keyEnum => PositionKeys[keyEnum])
+          .map(key => key.toString() + ": " + this.positionData[key].toString())
           .reduce((acc, curr) => acc + "\n" + curr);
       
     var timeDataString =
@@ -35,6 +35,6 @@ export class SensorModel {
           .map(key => key.toString() + ": " + this.timeData[key].toString())
           .reduce((acc, curr) => acc + "\n" + curr);
 
-    return locationString + "\n" + timeDataString;
+    return positionString + "\n" + timeDataString;
   }
 }
