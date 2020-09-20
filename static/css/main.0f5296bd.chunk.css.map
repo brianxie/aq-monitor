@@ -1,0 +1,1 @@
+{"version":3,"sources":["index.css"],"names":[],"mappings":"AAAA,KACE,iBAAkB,CAClB,WACF,CAEA,wBACE,SACF,CAEA,+BACE,SAAU,CACV,sBACF","file":"main.0f5296bd.chunk.css","sourcesContent":["body {\n  text-align: center;\n  margin: auto;\n}\n\n.StatusTransition-enter {\n  opacity: 0;\n}\n\n.StatusTransition-enter-active {\n  opacity: 1;\n  transition: opacity 300ms;\n}\n"]}
