@@ -78,6 +78,13 @@ function distanceFromCurrentPosition(sensorModel, position) {
   return 2 * RADIUS * Math.asin(Math.sqrt(havCentralAngle));
 }
 
+function wrapSensorModelWithDistance(sensorModel, position) {
+  return {
+    sensorModel: sensorModel,
+    distance: distanceFromCurrentPosition(sensorModel, position)
+  }
+}
+
 const MAX_SENSORS = 6;
 const RADIANS_PER_DEGREE = Math.PI / 180;
 const RADIUS = 6371; // km
@@ -129,11 +136,10 @@ class SensorsComponent extends React.Component {
       var position = positionResult[ResponseUtils.ResponseProperties.VALUE];
       var sensorModels = sensorModelsResult[ResponseUtils.ResponseProperties.VALUE];
       return sensorModels
-        .sort((a, b) =>
-          distanceFromCurrentPosition(a, position)
-          - distanceFromCurrentPosition(b, position))
+        .map(sensorModel => wrapSensorModelWithDistance(sensorModel, position))
+        .sort((a, b) => a["distance"] - b["distance"])
         .slice(0, limit)
-        .map(model => this.getSingleSensorElem(model));
+        .map(sensorWithDistance => this.computeScore(sensorWithDistance));
     }
 
     throw new Error(
@@ -142,10 +148,15 @@ class SensorsComponent extends React.Component {
   }
 
   // Can obtain more from SensorModel::toString
-  getSingleSensorElem(sensorModel) {
+  computeScore(sensorWithDistance) {
     return (
       <div class="card-body">
-        {computeAQIPM25(sensorModel.timeData[Sensor.TimeDataKeys.REALTIME])}
+        <div>
+          {computeAQIPM25(sensorWithDistance["sensorModel"].timeData[Sensor.TimeDataKeys.REALTIME])}
+        </div>
+        <div>
+          {sensorWithDistance["distance"]}
+        </div>
       </div>
     );
   }
